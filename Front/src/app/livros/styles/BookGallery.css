@@ -1,0 +1,168 @@
+@font-face {
+  font-family: Troubleside;
+  src: url("https://cdn.jsdelivr.net/gh/chytanka/chytanka.github.io/src/assets/fonts/Troubleside.ttf");
+  font-display: swap;
+}
+
+:root {
+  --ratio: 257 / 364;
+  --t: 0.133333334s;
+  --min-card-width: 192px;
+  --accent: #6366f1;
+  --surface: #166496;
+
+  --avarage-l: 0.48;
+  --avarage-l-2: 0.36;
+  --avarage-base: #6366f1;
+  --text: white;
+
+  --radius: 0.5rem;
+  --border-size: 0.25rem;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --avarage-l: 0.72;
+    --avarage-l-2: 0.6;
+    --accent: #6366f1;
+    --surface: #f5f7fa;
+    --avarage-base: #6366f1;
+    --text: black;
+  }
+}
+
+@keyframes shrink-top {
+  0% {
+    --item-scale: 0.5;
+    --item-angle: -60deg;
+    transform-origin: top;
+  }
+}
+
+@keyframes shrink-bottom {
+  0% {
+    --item-scale: 0.5;
+    --item-angle: 60deg;
+    transform-origin: bottom;
+  }
+}
+
+.book-gallery h1 {
+  color: var(--accent);
+  font-family: Troubleside, sans-serif;
+  margin: 1rem 0 0;
+}
+
+.book-gallery-container {
+  padding: 2rem;
+}
+
+.book-section {
+  margin-bottom: 2rem;
+  position: relative;
+  perspective: 4000px;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(var(--min-card-width), 1fr));
+}
+
+.book-section header {
+  grid-column: 1 / -1;
+}
+
+.book-card {
+  --deg: 0.8deg;
+  --y: 0;
+  --item-scale: 1;
+  --item-angle: 0deg;
+  --shadow-distance: var(--border-size);
+  border: var(--border-size) solid var(--avarage-color, var(--avarage-base));
+  border-radius: var(--radius);
+  background-color: var(--avarage-color, var(--avarage-base));
+  background-image: radial-gradient(rgba(0,0,0,0.1) 1px, transparent 0px);
+  background-repeat: repeat;
+  background-size: 7px 7px;
+  background-position: center;
+
+  box-shadow: 1px 1px var(--surface), var(--shadow-distance) var(--shadow-distance) rgba(0,0,0,0.2);
+  opacity: 0.8;
+  transform: rotate(var(--deg)) translateY(var(--y)) scale(var(--item-scale)) rotateX(var(--item-angle));
+  transition: all var(--t) ease-in-out;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+.book-card:hover {
+  --deg: 0;
+  --y: -1.25ch;
+  --shadow-distance: calc(var(--border-size) * 2);
+  opacity: 1;
+}
+
+.book-figure {
+  margin: 0;
+}
+
+.book-figure img {
+  aspect-ratio: var(--ratio);
+  object-fit: cover;
+  border-radius: calc(var(--radius) - var(--border-size));
+  width: 100%;
+  height: auto;
+}
+
+.book-figure figcaption {
+  font-family: Troubleside, sans-serif;
+  margin: 1ch;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  word-break: break-word;
+  line-height: 1;
+  color: var(--text);
+}
+
+.book-card:nth-child(2n) {
+  --deg: -0.8deg;
+}
+
+.book-card:nth-child(2n + 1) {
+  --deg: -0.6deg;
+}
+
+.book-card:nth-child(3n) {
+  --deg: 0.6deg;
+}
+
+.book-card:nth-child(4n + 2) {
+  --deg: -0.75deg;
+}
+
+.book-card:nth-child(5n) {
+  --deg: 0.25deg;
+}
+
+.book-card:nth-child(6n + 3) {
+  --deg: -0.3deg;
+}
+
+.book-card:nth-child(7n) {
+  --deg: 0.9deg;
+}
+
+/* Indicador de áudio */
+.book-card .audio-indicator {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}

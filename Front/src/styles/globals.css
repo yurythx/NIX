@@ -1,0 +1,269 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  }
+
+  /* Variáveis CSS para temas */
+  :root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-color-rgb: 79, 70, 229;
+  }
+}
+
+@layer components {
+  .sidebar-link {
+    @apply flex items-center gap-3 p-3 rounded-lg cursor-pointer
+           hover:bg-purple-100 dark:hover:bg-indigo-900
+           text-gray-600 dark:text-gray-200
+           transition-colors duration-200;
+  }
+
+  .animate-fade-in-out {
+    animation: fadeInOut 1.5s ease-in-out;
+  }
+
+  /* Botões com cores de tema */
+  .btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--primary-hover);
+  }
+
+  /* Textos com cores de tema */
+  .text-theme {
+    color: var(--primary-color);
+  }
+
+  /* Bordas com cores de tema */
+  .border-theme {
+    border-color: var(--primary-color);
+  }
+
+  /* Fundos com cores de tema */
+  .bg-theme {
+    background-color: var(--primary-color);
+  }
+
+  /* Anéis de foco com cores de tema */
+  .ring-theme {
+    --tw-ring-color: var(--primary-color);
+  }
+}
+
+/* Animações */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes colorPulse {
+  0% {
+    filter: saturate(1);
+  }
+  50% {
+    filter: saturate(1.2);
+  }
+  100% {
+    filter: saturate(1);
+  }
+}
+
+@keyframes themeTransition {
+  0% {
+    opacity: 0.95;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.theme-color-changing * {
+  animation: themeTransition 0.3s ease-out forwards;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+}
+
+.theme-color-changing button,
+.theme-color-changing a {
+  animation: colorPulse 0.3s ease-out forwards;
+}
+
+/* Estilos para o modo de leitura sépia */
+.sepia {
+  background-color: #f8f3e3;
+  color: #5f4b32;
+}
+
+/* Estilos para temas de cores */
+.theme-blue .bg-indigo-600,
+.theme-blue .bg-blue-600,
+.theme-blue .bg-purple-600,
+.theme-blue button.bg-indigo-600,
+.theme-blue button.bg-blue-600,
+.theme-blue button.bg-purple-600,
+.theme-blue a.bg-indigo-600,
+.theme-blue a.bg-blue-600,
+.theme-blue a.bg-purple-600 {
+  background-color: var(--primary-color) !important;
+}
+
+.theme-blue .hover\:bg-indigo-700:hover,
+.theme-blue .hover\:bg-blue-700:hover,
+.theme-blue .hover\:bg-purple-700:hover {
+  background-color: var(--primary-hover) !important;
+}
+
+.theme-blue .text-indigo-600,
+.theme-blue .text-blue-600,
+.theme-blue .text-purple-600 {
+  color: var(--primary-color) !important;
+}
+
+.theme-blue .border-indigo-500,
+.theme-blue .border-blue-500,
+.theme-blue .border-purple-500 {
+  border-color: var(--primary-color) !important;
+}
+
+/* Aplicar o mesmo para outros temas */
+.theme-purple .bg-indigo-600,
+.theme-purple .bg-blue-600,
+.theme-purple .bg-purple-600 {
+  background-color: var(--primary-color) !important;
+}
+
+.theme-green .bg-indigo-600,
+.theme-green .bg-blue-600,
+.theme-green .bg-purple-600 {
+  background-color: var(--primary-color) !important;
+}
+
+.theme-red .bg-indigo-600,
+.theme-red .bg-blue-600,
+.theme-red .bg-purple-600 {
+  background-color: var(--primary-color) !important;
+}
+
+.theme-orange .bg-indigo-600,
+.theme-orange .bg-blue-600,
+.theme-orange .bg-purple-600 {
+  background-color: var(--primary-color) !important;
+}
+
+/* Estilos para o visualizador de mangá */
+.manga-gallery {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.manga-gallery-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.manga-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .manga-section {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+.manga-card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.2s ease-in-out;
+}
+
+.manga-card:hover {
+  transform: translateY(-5px);
+}
+
+.manga-figure {
+  position: relative;
+  width: 100%;
+  height: 0;
+  padding-bottom: 150%; /* Proporção 2:3 para capas de mangá */
+  overflow: hidden;
+}
+
+.manga-figure img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.manga-card:hover .manga-figure img {
+  transform: scale(1.05);
+}
+
+
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}

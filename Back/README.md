@@ -1,98 +1,286 @@
-# NIX - Sistema de Gerenciamento de Projetos
+# Viixen Backend
 
-Sistema de gerenciamento de projetos desenvolvido com Django e Django REST Framework.
+Este é o backend do projeto Viixen, desenvolvido com Django e Django REST Framework.
 
-## Requisitos
+## Arquitetura do Projeto
 
-- Python 3.11 ou superior
-- PostgreSQL
-- Redis (para Celery)
+O projeto segue uma arquitetura em camadas, implementando os padrões de Repository e Service para separar as responsabilidades e facilitar a manutenção e os testes.
 
-## Instalação
-
-1. Clone o repositório:
-```bash
-git clone https://github.com/seu-usuario/NIX.git
-cd NIX
-```
-
-2. Crie um ambiente virtual e ative-o:
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-venv\Scripts\activate     # Windows
-```
-
-3. Instale as dependências:
-```bash
-pip install -r requirements.txt
-```
-
-4. Configure as variáveis de ambiente:
-Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis:
-```
-DEBUG=True
-SECRET_KEY=sua-chave-secreta
-DATABASE_URL=postgres://usuario:senha@localhost:5432/nix
-REDIS_URL=redis://localhost:6379/0
-```
-
-5. Execute as migrações:
-```bash
-python manage.py migrate
-```
-
-6. Crie um superusuário:
-```bash
-python manage.py createsuperuser
-```
-
-7. Inicie o servidor de desenvolvimento:
-```bash
-python manage.py runserver
-```
-
-## Estrutura do Projeto
+### Estrutura de Diretórios
 
 ```
-NIX/
-├── apps/
-│   ├── projects/      # Aplicação principal de projetos
-│   ├── users/         # Gerenciamento de usuários
-│   └── core/          # Funcionalidades core do sistema
-├── config/            # Configurações do projeto
-├── static/            # Arquivos estáticos
-└── templates/         # Templates HTML
+Back/
+├── apps/                 # Apps Django
+│   ├── accounts/         # App de contas de usuário
+│   ├── articles/         # App de artigos
+│   ├── books/            # App de livros
+│   ├── categories/       # App de categorias
+│   └── mangas/           # App de mangás
+├── core/                 # Configurações e módulos centrais
+│   ├── repositories/     # Repositórios para acesso a dados
+│   ├── services/         # Serviços para lógica de negócios
+│   └── settings.py       # Configurações do Django
+└── manage.py             # Script de gerenciamento do Django
 ```
 
-## Funcionalidades
+### Padrões de Design Implementados
 
-- Gerenciamento de projetos
-- Quadros de tarefas (Kanban)
-- Comentários e anexos
-- Sistema de permissões
-- API RESTful
-- Documentação Swagger/ReDoc
+#### 1. Padrão de Repositório
 
-## Desenvolvimento
+O padrão de repositório encapsula a lógica de acesso a dados, fornecendo uma interface abstrata para as operações de CRUD (Create, Read, Update, Delete).
 
-Para contribuir com o projeto:
+**Benefícios:**
+- Separa a lógica de acesso a dados da lógica de negócios
+- Facilita a manutenção e os testes
+- Permite trocar a fonte de dados sem afetar a lógica de negócios
 
-1. Crie uma branch para sua feature:
-```bash
-git checkout -b feature/nova-feature
+**Implementação:**
+- `BaseRepository`: Classe base com métodos comuns para todos os repositórios
+- Repositórios específicos: `ArticleRepository`, `UserRepository`, `CategoryRepository`, etc.
+
+#### 2. Padrão de Serviço
+
+O padrão de serviço encapsula a lógica de negócios, fornecendo uma interface para as operações de negócios.
+
+**Benefícios:**
+- Separa a lógica de negócios da lógica de apresentação
+- Facilita a reutilização de código
+- Melhora a testabilidade
+
+**Implementação:**
+- `BaseService`: Classe base com métodos comuns para todos os serviços
+- Serviços específicos: `ArticleService`, `UserService`, `CategoryService`, etc.
+
+### Fluxo de Dados
+
+```
+Cliente HTTP → Views → Serviços → Repositórios → Modelos → Banco de Dados
 ```
 
-2. Faça commit das suas alterações:
-```bash
-git commit -m "Adiciona nova feature"
+1. **Views (Controllers)**: Recebem as requisições HTTP, validam os dados e chamam os serviços apropriados
+2. **Serviços**: Implementam a lógica de negócios e chamam os repositórios para acessar os dados
+3. **Repositórios**: Acessam os modelos do Django para realizar operações no banco de dados
+4. **Modelos**: Representam as entidades do domínio e são mapeados para tabelas no banco de dados
+
+### Diagrama de Componentes
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│    Views    │────▶│  Serviços   │────▶│ Repositórios│────▶│   Modelos   │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+       │                   │                   │                   │
+       │                   │                   │                   │
+       ▼                   ▼                   ▼                   ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│ Serializers │     │Lógica de    │     │Acesso a     │     │Banco de     │
+│             │     │Negócios     │     │Dados        │     │Dados        │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
 ```
 
-3. Envie para o repositório:
-```bash
-git push origin feature/nova-feature
+## Componentes Principais
+
+### Repositórios
+
+Os repositórios são responsáveis por encapsular a lógica de acesso a dados. Cada repositório é especializado em um modelo específico.
+
+**Exemplo:**
+```python
+class ArticleRepository(BaseRepository):
+    def get_featured(self) -> QuerySet:
+        return self.model_class.objects.filter(featured=True)
 ```
 
-## Licença
+### Serviços
 
-Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Os serviços são responsáveis por encapsular a lógica de negócios. Cada serviço utiliza um ou mais repositórios para acessar os dados.
+
+**Exemplo:**
+```python
+class ArticleService(BaseService):
+    def get_featured_articles(self) -> QuerySet:
+        return self.repository.get_featured()
+```
+
+### Views
+
+As views são responsáveis por receber as requisições HTTP, validar os dados e chamar os serviços apropriados.
+
+**Exemplo:**
+```python
+class ArticleViewSet(viewsets.ModelViewSet):
+    @action(detail=True, methods=['post'])
+    def increment_views(self, request, slug=None):
+        article = self.get_object()
+        article_service.view_article(article.id)
+        return Response({
+            'status': 'success',
+            'views_count': article.views_count
+        })
+```
+
+## Benefícios da Arquitetura
+
+1. **Separação de Responsabilidades**: Cada componente tem uma responsabilidade clara e bem definida
+2. **Testabilidade**: Facilita a escrita de testes unitários e de integração
+3. **Manutenibilidade**: Facilita a manutenção e evolução do código
+4. **Reutilização**: Facilita a reutilização de código em diferentes partes do sistema
+5. **Escalabilidade**: Facilita a escalabilidade do sistema, permitindo que diferentes componentes sejam escalados independentemente
+
+## Como Contribuir
+
+1. Clone o repositório
+2. Crie um ambiente virtual: `python -m venv env`
+3. Ative o ambiente virtual: `source env/bin/activate` (Linux/Mac) ou `env\Scripts\activate` (Windows)
+4. Instale as dependências: `pip install -r requirements.txt`
+5. Execute as migrações: `python manage.py migrate`
+6. Execute o servidor: `python manage.py runserver`
+
+## API de Livros
+
+A API de livros permite gerenciar livros, incluindo a leitura de arquivos PDF.
+
+### Endpoints
+
+#### Listar todos os livros
+
+```
+GET /api/v1/books/books/
+```
+
+Retorna uma lista de todos os livros.
+
+#### Obter um livro específico
+
+```
+GET /api/v1/books/books/{slug}/
+```
+
+Retorna os detalhes de um livro específico.
+
+#### Criar um novo livro
+
+```
+POST /api/v1/books/books/
+```
+
+Cria um novo livro. Os seguintes campos são obrigatórios:
+
+- `title`: Título do livro
+- `description`: Descrição do livro
+- `cover_image`: Imagem de capa do livro (arquivo)
+- `pdf_file`: Arquivo PDF do livro (arquivo)
+
+O campo `audio_file` é opcional.
+
+#### Atualizar um livro
+
+```
+PUT /api/v1/books/books/{slug}/
+```
+
+Atualiza um livro existente.
+
+#### Excluir um livro
+
+```
+DELETE /api/v1/books/books/{slug}/
+```
+
+Exclui um livro existente.
+
+### Leitura de PDF
+
+#### Ler o conteúdo do PDF como texto
+
+```
+GET /api/v1/books/books/{slug}/read_pdf/
+```
+
+Retorna o conteúdo do PDF como texto. Parâmetros opcionais:
+
+- `page`: Número da página a ser lida (padrão: 1)
+
+Exemplo de resposta:
+
+```json
+{
+  "total_pages": 1,
+  "current_page": 1,
+  "text": "Este é um arquivo PDF de teste válido.\n"
+}
+```
+
+#### Obter o URL do PDF
+
+```
+GET /api/v1/books/books/{slug}/pdf_as_images/
+```
+
+Retorna o URL do PDF para ser renderizado no frontend.
+
+Exemplo de resposta:
+
+```json
+{
+  "total_pages": 1,
+  "pdf_url": "http://127.0.0.1:8000/media/books/test_valid.pdf",
+  "message": "Use este URL para acessar o arquivo PDF diretamente. O frontend pode usar bibliotecas como PDF.js para renderizar o PDF."
+}
+```
+
+### Implementação no Frontend
+
+Para renderizar o PDF no frontend, você pode usar a biblioteca [PDF.js](https://mozilla.github.io/pdf.js/). Exemplo de implementação:
+
+```javascript
+// Importar PDF.js
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Configurar o worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdf.worker.js';
+
+// Função para renderizar o PDF
+async function renderPDF(pdfUrl, canvasId, pageNumber = 1) {
+  try {
+    // Carregar o PDF
+    const loadingTask = pdfjsLib.getDocument(pdfUrl);
+    const pdf = await loadingTask.promise;
+
+    // Obter a página
+    const page = await pdf.getPage(pageNumber);
+
+    // Configurar o canvas
+    const canvas = document.getElementById(canvasId);
+    const context = canvas.getContext('2d');
+
+    // Configurar a escala
+    const viewport = page.getViewport({ scale: 1.5 });
+    canvas.height = viewport.height;
+    canvas.width = viewport.width;
+
+    // Renderizar a página
+    const renderContext = {
+      canvasContext: context,
+      viewport: viewport
+    };
+    await page.render(renderContext).promise;
+
+    return {
+      totalPages: pdf.numPages,
+      currentPage: pageNumber
+    };
+  } catch (error) {
+    console.error('Erro ao renderizar o PDF:', error);
+    throw error;
+  }
+}
+
+// Exemplo de uso
+renderPDF('http://127.0.0.1:8000/media/books/test_valid.pdf', 'pdf-canvas')
+  .then(result => {
+    console.log(`Página ${result.currentPage} de ${result.totalPages}`);
+  })
+  .catch(error => {
+    console.error('Erro:', error);
+  });
+```

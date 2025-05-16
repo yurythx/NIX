@@ -1,0 +1,15 @@
+/* Estilos para o footer */
+footer {
+  border-top: 1px solid rgba(75, 85, 99, 0.3);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  footer h3 {
+    font-size: 1rem;
+  }
+
+  footer p, footer a {
+    font-size: 0.875rem;
+  }
+}

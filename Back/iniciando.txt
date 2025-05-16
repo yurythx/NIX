@@ -42,10 +42,13 @@ Instalar os seguintes pacotes Iniciais.
         pip install mysql-connector-python
         pip install sentry_sdk
         pip install django_redis
-
-        
+        pip install djangorestframework-simplejwt
+        pip install django_filter
+        pip install djoser 
+        pip install drf-yasg       
         pip install django-cors-headers
-        pip install bleach==6.0.0
+        pip install bleach
+
         pip install django-session-timeout
         
         
@@ -80,56 +83,9 @@ Instalar os seguintes pacotes Iniciais.
 
 
 
-# Estrutura de diretórios do projeto
-NIX/
-├── manage.py
-├── requirements.txt
-├── .env
-├── .gitignore
-├── core/
-│   ├── __init__.py
-│   ├── asgi.py
-│   ├── settings.py
-│   ├── urls.py
-│   ├── wsgi.py
-├── accounts/
-│   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── migrations/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── urls.py
-│   ├── views.py
-├── boards/
-│   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── migrations/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── urls.py
-│   ├── views.py
-├── tasks/
-│   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── migrations/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── urls.py
-│   ├── views.py
-├── teams/
-│   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── migrations/
-│   ├── models.py
-│   ├── serializers.py
-│   ├── urls.py
-│   ├── views.py
-└── utils/
-    ├── __init__.py
-    ├── mixins.py
-    ├── permissions.py
-    └── validators.py
+
+npm install
+
+npm run dev
+
+npm install next react react-dom

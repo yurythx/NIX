@@ -1,0 +1,52 @@
+Ambiente Virtual
+
+        Criando ambiente virtual
+
+            -- python -m venv meu_ambiente_virtual
+
+        ativando ambiente virtual
+
+        No Windows:
+
+            -- meu_ambiente_virtual\Scripts\activate
+			
+			-- pip install -r requirements.txt
+
+
+        caso de erro no windows
+
+            -- PS C:> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+            
+        No macOS e Linux:
+
+            -- source meu_ambiente_virtual/bin/activate
+
+        Como Desativar um Ambiente Virtual
+
+            -- deactivate
+
+
+pip install djangorestframework-simplejwt
+
+        
+
+-- django-admin startproject core .
+
+-- python manage.py startapp base 
+
+-- python manage.py makemigrations
+
+-- python manage.py migrate
+
+-- python manage.py runserver
+
+-- python manage.py createsuperuser
+
+
+
+
+npm install
+
+npm run dev
+
+npm install next react react-dom

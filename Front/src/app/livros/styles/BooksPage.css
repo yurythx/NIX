@@ -1,0 +1,111 @@
+/* Estilos para a página de livros */
+
+/* Hero Section */
+.books-hero {
+  @apply relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 py-12 px-4 mb-12 shadow-xl;
+  min-height: 300px;
+}
+
+.books-hero-content {
+  @apply relative z-10 text-center max-w-4xl mx-auto;
+}
+
+.hero-element {
+  @apply backdrop-blur-sm;
+}
+
+/* Seções de livros */
+.books-section {
+  @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm;
+}
+
+.section-title {
+  @apply text-xl md:text-2xl font-bold flex items-center gap-2 text-gray-900 dark:text-white;
+}
+
+.section-icon {
+  @apply inline-block;
+}
+
+/* Grid de livros */
+.books-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6;
+}
+
+/* Card de livro */
+.book-card {
+  @apply bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300;
+}
+
+.book-image-container {
+  @apply relative overflow-hidden h-48 sm:h-56;
+}
+
+.book-image {
+  @apply w-full h-full object-cover transition-transform duration-500;
+}
+
+.book-card:hover .book-image {
+  @apply scale-105;
+}
+
+.book-content {
+  @apply p-4;
+}
+
+.book-category {
+  @apply inline-flex items-center text-xs font-medium text-indigo-600 dark:text-indigo-400 mb-2;
+}
+
+.book-title {
+  @apply text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-1;
+}
+
+.book-excerpt {
+  @apply text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2;
+}
+
+.book-meta {
+  @apply flex items-center justify-between text-xs text-gray-500 dark:text-gray-400;
+}
+
+.book-meta-item {
+  @apply flex items-center gap-1;
+}
+
+/* Estatísticas */
+.stats-card {
+  @apply transition-all duration-300;
+}
+
+/* Paginação */
+.pagination {
+  @apply flex justify-center mt-8;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+  .books-grid {
+    @apply grid-cols-1;
+  }
+  
+  .book-image-container {
+    height: 200px;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}

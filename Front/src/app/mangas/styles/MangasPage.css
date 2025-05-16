@@ -1,0 +1,160 @@
+/* Estilos para a página de mangás */
+
+/* Hero Section */
+.mangas-hero {
+  @apply relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 py-12 px-4 mb-12 shadow-xl;
+  min-height: 300px;
+}
+
+.mangas-hero-content {
+  @apply relative z-10 text-center max-w-4xl mx-auto;
+}
+
+.hero-element {
+  @apply backdrop-blur-sm;
+}
+
+/* Efeito de grid no hero */
+.bg-grid-white\/10 {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+}
+
+/* Seções de mangás */
+.mangas-section {
+  @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm mb-8;
+}
+
+.section-title {
+  @apply text-xl md:text-2xl font-bold flex items-center gap-2 text-gray-900 dark:text-white mb-4;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -0.5rem;
+  width: 3rem;
+  height: 0.25rem;
+  background-color: var(--primary-color);
+  border-radius: 0.125rem;
+  transition: width 0.3s ease;
+}
+
+.section-title:hover::after {
+  width: 6rem;
+}
+
+.section-icon {
+  @apply inline-block text-purple-500;
+}
+
+/* Grid de mangás */
+.mangas-grid {
+  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6;
+}
+
+/* Card de mangá */
+.manga-card {
+  @apply bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300;
+  transform: rotate(var(--deg, 0deg)) translateY(var(--y, 0));
+}
+
+.manga-card:hover {
+  @apply scale-105;
+  --y: -5px;
+}
+
+.manga-image-container {
+  @apply relative overflow-hidden;
+  aspect-ratio: var(--ratio, 257 / 364);
+}
+
+.manga-image {
+  @apply w-full h-full object-cover transition-transform duration-500;
+}
+
+.manga-card:hover .manga-image {
+  @apply scale-105;
+}
+
+.manga-content {
+  @apply p-3;
+}
+
+.manga-category {
+  @apply inline-flex items-center text-xs font-medium text-purple-600 dark:text-purple-400 mb-1;
+}
+
+.manga-title {
+  @apply text-sm font-bold text-gray-900 dark:text-white mb-1 line-clamp-1;
+}
+
+.manga-meta {
+  @apply flex items-center justify-between text-xs text-gray-500 dark:text-gray-400;
+}
+
+.manga-meta-item {
+  @apply flex items-center gap-1;
+}
+
+/* Estatísticas */
+.stats-card {
+  @apply transition-all duration-300;
+}
+
+/* Paginação */
+.pagination {
+  @apply flex justify-center mt-8;
+}
+
+/* Responsividade */
+@media (max-width: 640px) {
+  .mangas-grid {
+    @apply grid-cols-2;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Variações de rotação para os cards */
+.manga-card:nth-child(2n) {
+  --deg: -0.8deg;
+}
+
+.manga-card:nth-child(2n + 1) {
+  --deg: -0.6deg;
+}
+
+.manga-card:nth-child(3n) {
+  --deg: 0.6deg;
+}
+
+.manga-card:nth-child(4n + 2) {
+  --deg: -0.75deg;
+}
+
+.manga-card:nth-child(5n) {
+  --deg: 0.25deg;
+}
+
+.manga-card:nth-child(6n + 3) {
+  --deg: -0.3deg;
+}
+
+.manga-card:nth-child(7n) {
+  --deg: 0.9deg;
+}

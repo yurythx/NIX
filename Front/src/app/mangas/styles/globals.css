@@ -1,0 +1,63 @@
+:root {
+    /* Usar variáveis globais para permitir mudança de tema */
+    --secondary-color: #2575fc;
+    --accent-color: #ff6b6b;
+    --text-color: #333;
+    --light-text: #f8f9fa;
+    --background: #f8f9fa;
+    --card-bg: #ffffff;
+    --shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+  }
+
+  /* Ajustes para tema escuro */
+  .dark {
+    --text-color: #f8f9fa;
+    --light-text: #333;
+    --background: #1f2937;
+    --card-bg: #111827;
+    --shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Ajustes para tema sépia */
+  .sepia {
+    --text-color: #5f4b32;
+    --light-text: #f8f3e3;
+    --background: #f8f3e3;
+    --card-bg: #f0e6d2;
+    --shadow: 0 5px 15px rgba(95, 75, 50, 0.1);
+  }
+
+  body {
+    margin: 0;
+    background: var(--background);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2rem;
+    margin: 2rem 0;
+    color: var(--primary-color);
+    position: relative;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 2px;
+  }

@@ -1,0 +1,388 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { ArrowLeft, ArrowRight, ArrowUp, Home, List, ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { mangasService } from '../../../../core/services/api';
+import { useAuth } from '../../../../core/contexts/AuthContext';
+import { useNotification } from '../../../../core/contexts/NotificationContext';
+
+interface Page {
+  id: number;
+  image: string;
+  page_number: number;
+}
+
+interface Chapter {
+  id: number;
+  title: string;
+  number: number;
+  pages: Page[];
+  created_at: string;
+  chapter_type: string;
+  pdf_file?: string;
+}
+
+export default function CapituloPage({ params }: { params: { slug: string; number: string } }) {
+  const router = useRouter();
+  const { isAuthenticated } = useAuth();
+  const { showNotification } = useNotification();
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [manga, setManga] = useState<{ id: number; title: string; slug: string } | null>(null);
+  const [chapter, setChapter] = useState<Chapter | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+  const [nextChapter, setNextChapter] = useState<{ number: number } | null>(null);
+  const [prevChapter, setPrevChapter] = useState<{ number: number } | null>(null);
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<any[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
+  // Novas variáveis para melhorar a experiência de leitura
+  const [zoomLevel, setZoomLevel] = useState(100); // Porcentagem de zoom
+  const [readingMode, setReadingMode] = useState<'paged' | 'continuous'>('paged'); // Modo de leitura
+  const [showSettings, setShowSettings] = useState(false); // Mostrar configurações
+
+  // Variáveis para PDF
+  const [pdfCurrentPage, setPdfCurrentPage] = useState(1);
+  const [pdfTotalPages, setPdfTotalPages] = useState(0);
+
+  // Carregar dados do mangá e capítulo
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+
+        // Buscar o mangá
+        const mangaData = await mangasService.getMangaBySlug(params.slug);
+
+        if (!mangaData) {
+          setError('Mangá não encontrado');
+          return;
+        }
+
+        setManga({
+          id: mangaData.id,
+          title: mangaData.title,
+          slug: mangaData.slug
+        });
+
+        // Buscar todos os capítulos para navegação entre capítulos
+        const chaptersData = await mangasService.getChaptersByManga(params.slug);
+
+        // Ordenar capítulos por número
+        const sortedChapters = [...chaptersData].sort((a, b) => a.number - b.number);
+
+        // Encontrar o capítulo atual
+        const chapterNumber = parseInt(params.number);
+        const currentChapterIndex = sortedChapters.findIndex(c => c.number === chapterNumber);
+
+        if (currentChapterIndex === -1) {
+          setError('Capítulo não encontrado');
+          return;
+        }
+
+        // Definir capítulos anterior e próximo
+        if (currentChapterIndex > 0) {
+          setPrevChapter(sortedChapters[currentChapterIndex - 1]);
+        }
+
+        if (currentChapterIndex < sortedChapters.length - 1) {
+          setNextChapter(sortedChapters[currentChapterIndex + 1]);
+        }
+
+        // Buscar as páginas do capítulo
+        const currentChapter = sortedChapters[currentChapterIndex];
+        const pagesData = await mangasService.getPagesByChapter(currentChapter.id);
+
+        // Ordenar páginas por número
+        const sortedPages = pagesData.sort((a, b) => a.page_number - b.page_number);
+
+        setChapter({
+          ...currentChapter,
+          pages: sortedPages
+        });
+
+        // Salvar progresso de leitura ao abrir o capítulo
+        if (isAuthenticated && currentChapter) {
+          saveReadingProgress(currentChapter.id);
+        }
+
+        setError(null);
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        setError('Erro ao carregar o capítulo. Tente novamente mais tarde.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params.slug, params.number, isAuthenticated]);
+
+  // Salvar progresso de leitura
+  const saveReadingProgress = async (chapterId: number, pageId?: number) => {
+    if (!isAuthenticated) return;
+
+    try {
+      await mangasService.updateReadingProgress(params.slug, chapterId, pageId);
+    } catch (error) {
+      console.error('Erro ao salvar progresso de leitura:', error);
+    }
+  };
+
+  // Salvar progresso de leitura para PDF
+  const savePdfReadingProgress = async (chapterId: number) => {
+    if (!isAuthenticated) return;
+
+    try {
+      // Para PDFs, salvamos apenas o ID do capítulo, sem página específica
+      // Podemos adicionar um campo adicional no futuro para rastrear a página do PDF
+      await mangasService.updateReadingProgress(params.slug, chapterId);
+      showNotification('Progresso salvo!', 'success');
+    } catch (error) {
+      console.error('Erro ao salvar progresso de leitura do PDF:', error);
+    }
+  };
+
+  // Configurar comunicação com o iframe do PDF
+  useEffect(() => {
+    if (!chapter || chapter.chapter_type !== 'pdf') return;
+
+    const handlePdfMessage = (event: MessageEvent) => {
+      // Verificar se a mensagem é do nosso iframe
+      if (event.data && typeof event.data === 'object') {
+        // Atualizar informações do PDF
+        if (event.data.type === 'pdfInfo') {
+          setPdfTotalPages(event.data.totalPages);
+        }
+        // Atualizar página atual
+        else if (event.data.type === 'pageChange') {
+          setPdfCurrentPage(event.data.page);
+
+          // Salvar progresso a cada 5 páginas ou quando o usuário clicar no botão de salvar
+          if (event.data.page % 5 === 0 && chapter) {
+            savePdfReadingProgress(chapter.id);
+          }
+        }
+      }
+    };
+
+    window.addEventListener('message', handlePdfMessage);
+
+    return () => {
+      window.removeEventListener('message', handlePdfMessage);
+    };
+  }, [chapter]);
+
+  // Manipular navegação entre páginas
+  const goToNextPage = () => {
+    if (!chapter || currentPage >= chapter.pages.length - 1) {
+      // Se estiver na última página e houver próximo capítulo, ir para ele
+      if (nextChapter) {
+        router.push(`/mangas/${params.slug}/chapters/${nextChapter.number}`);
+      }
+      return;
+    }
+
+    const newPage = currentPage + 1;
+    setCurrentPage(newPage);
+
+    // Salvar progresso a cada 3 páginas ou na última página
+    if (chapter && (newPage % 3 === 0 || newPage === chapter.pages.length - 1)) {
+      saveReadingProgress(chapter.id, chapter.pages[newPage].id);
+    }
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage <= 0) {
+      // Se estiver na primeira página e houver capítulo anterior, ir para ele
+      if (prevChapter) {
+        router.push(`/mangas/${params.slug}/chapters/${prevChapter.number}`);
+      }
+      return;
+    }
+
+    setCurrentPage(prev => prev - 1);
+  };
+
+  // Manipular teclado para navegação
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Navegação básica
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        goToNextPage();
+      } else if (e.key === 'ArrowLeft') {
+        goToPrevPage();
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 'Escape') {
+        if (isFullscreen) {
+          setIsFullscreen(false);
+        } else if (showSettings) {
+          setShowSettings(false);
+        } else if (showComments) {
+          setShowComments(false);
+        }
+      }
+
+      // Controles de zoom
+      else if (e.key === '+' || (e.ctrlKey && e.key === '=')) {
+        e.preventDefault(); // Prevenir zoom do navegador
+        zoomIn();
+      } else if (e.key === '-' || (e.ctrlKey && e.key === '-')) {
+        e.preventDefault(); // Prevenir zoom do navegador
+        zoomOut();
+      } else if (e.key === '0' && e.ctrlKey) {
+        e.preventDefault(); // Prevenir reset do navegador
+        resetZoom();
+      }
+
+      // Alternar modo de leitura
+      else if (e.key === 'm' || e.key === 'M') {
+        toggleReadingMode();
+      }
+
+      // Mostrar/esconder configurações
+      else if (e.key === 's' || e.key === 'S') {
+        setShowSettings(prev => !prev);
+      }
+
+      // Mostrar/esconder comentários
+      else if (e.key === 'c' || e.key === 'C') {
+        setShowComments(prev => !prev);
+      }
+
+      // Ir para o início ou fim do capítulo
+      else if (e.key === 'Home' && chapter) {
+        setCurrentPage(0);
+      } else if (e.key === 'End' && chapter) {
+        setCurrentPage(chapter.pages.length - 1);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [currentPage, chapter, nextChapter, prevChapter, isFullscreen, showSettings, showComments]);
+
+  // Manipular cliques na imagem para navegação
+  const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+
+    // Clique no lado direito (70% da largura) avança, lado esquerdo (30%) volta
+    if (x > width * 0.3) {
+      goToNextPage();
+    } else {
+      goToPrevPage();
+    }
+  };
+
+  // Alternar modo tela cheia
+  const toggleFullscreen = () => {
+    setIsFullscreen(prev => !prev);
+  };
+
+  // Funções para controlar o zoom
+  const zoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 10, 200)); // Aumentar zoom em 10%, máximo 200%
+  };
+
+  const zoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 10, 50)); // Diminuir zoom em 10%, mínimo 50%
+  };
+
+  const resetZoom = () => {
+    setZoomLevel(100); // Resetar para 100%
+  };
+
+  // Alternar modo de leitura
+  const toggleReadingMode = () => {
+    setReadingMode(prev => prev === 'paged' ? 'continuous' : 'paged');
+    // Resetar zoom ao mudar o modo de leitura
+    setZoomLevel(100);
+  };
+
+  // Carregar comentários
+  const loadComments = async () => {
+    if (!chapter) return;
+
+    try {
+      const commentsData = await mangasService.getComments(chapter.id);
+      setComments(commentsData);
+    } catch (error) {
+      console.error('Erro ao carregar comentários:', error);
+      showNotification('Erro ao carregar comentários', 'error');
+    }
+  };
+
+  // Enviar um novo comentário
+  const submitComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!chapter || !newComment.trim() || !isAuthenticated) {
+      if (!isAuthenticated) {
+        showNotification('Você precisa estar logado para comentar', 'warning');
+      }
+      return;
+    }
+
+    try {
+      setIsSubmittingComment(true);
+      await mangasService.addComment(chapter.id, newComment);
+      setNewComment('');
+      showNotification('Comentário adicionado com sucesso', 'success');
+      loadComments(); // Recarregar comentários
+    } catch (error) {
+      console.error('Erro ao enviar comentário:', error);
+      showNotification('Erro ao enviar comentário', 'error');
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  // Carregar comentários quando o usuário clicar para mostrar
+  useEffect(() => {
+    if (showComments && chapter) {
+      loadComments();
+    }
+  }, [showComments, chapter]);
+
+  // Mostrar/esconder controles ao mover o mouse
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+
+    const handleMouseMove = () => {
+      setShowControls(true);
+
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (isFullscreen) {
+          setShowControls(false);
+        }
+      }, 3000);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      clearTimeout(timeout);
+    };
+  }, [isFullscreen]);
+
+  return (
+    <div className={`relative ${isFullscreen ? 'fixed inset-0 z-50 bg-black' : ''}`}>
+      {/* Conteúdo da página */}
+    </div>
+  );
+}
