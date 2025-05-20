@@ -2,32 +2,47 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+
+# Swagger / OpenAPI
+from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from rest_framework import permissions
-from django.views.generic import TemplateView
 
+# Views internas
+from .views import (
+    index,
+    system_stats,
+    db_stats,
+    health_check,
+    api_root,
+    server_status,
+)
+from .stats_views import global_statistics
+
+# Prefixo de versão da API
+API_PREFIX = 'api/v1/'
+
+# Documentação da API
 schema_view = get_schema_view(
     openapi.Info(
         title="Viixen API",
         default_version='v1',
         description="""
-        API do projeto Viixen para gerenciamento de conteúdo digital.
+API do projeto **Viixen** para gerenciamento de conteúdo digital.
 
-        ## Recursos Disponíveis
+### Recursos Disponíveis
+- **Usuários**: Gerenciamento de contas
+- **Artigos**: Publicação e administração
+- **Mangás**: Leitura e gerenciamento
+- **Livros**: Leitura e gerenciamento
+- **Categorias**: Organização por tema
+- **Avaliações**: Sistema de notas e feedback
 
-        * **Usuários**: Gerenciamento de contas de usuário
-        * **Artigos**: Publicação e gerenciamento de artigos
-        * **Mangás**: Leitura e gerenciamento de mangás
-        * **Livros**: Leitura e gerenciamento de livros
-        * **Categorias**: Organização de conteúdo por categorias
-        * **Avaliações**: Sistema de avaliações para conteúdos
-
-        ## Autenticação
-
-        A API utiliza autenticação JWT (JSON Web Token). Para acessar endpoints protegidos,
-        é necessário obter um token através do endpoint `/api/v1/auth/jwt/create/` e incluí-lo
-        no cabeçalho das requisições como `Authorization: Bearer {token}`.
+### Autenticação
+A autenticação é baseada em JWT (JSON Web Token).  
+Para obter um token, acesse:  
+`/api/v1/auth/jwt/create/`  
+Use o cabeçalho: `Authorization: Bearer <seu_token>`
         """,
         terms_of_service="https://www.viixen.com/terms/",
         contact=openapi.Contact(email="contato@viixen.com"),
@@ -35,50 +50,51 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
-    url=settings.BASE_URL if hasattr(settings, 'BASE_URL') else None,
+    url=getattr(settings, 'BASE_URL', None),
     patterns=[
-        path('api/v1/accounts/', include('apps.accounts.urls')),
-        path('api/v1/articles/', include('apps.articles.urls')),
-        path('api/v1/mangas/', include('apps.mangas.urls')),
-        path('api/v1/books/', include('apps.books.urls')),
-        path('api/v1/categories/', include('apps.categories.urls')),
-        path('api/v1/comments/', include('apps.comments.urls')),
-        # Excluindo ratings temporariamente
-        # path('api/v1/ratings/', include('apps.ratings.urls')),
-    ],
+        path(f'{API_PREFIX}accounts/', include('apps.accounts.urls')),
+        path(f'{API_PREFIX}articles/', include('apps.articles.urls')),
+        path(f'{API_PREFIX}mangas/', include('apps.mangas.urls')),
+        path(f'{API_PREFIX}books/', include('apps.books.urls')),
+        path(f'{API_PREFIX}categories/', include('apps.categories.urls')),
+    ]
 )
 
-# Padrão de versionamento de API
-api_prefix = 'api/v1/'
-
+# -------------------------------
+# URL Patterns
+# -------------------------------
 urlpatterns = [
+
+    # Admin
     path('admin/', admin.site.urls),
 
-    # API Documentation - Temporariamente desabilitado
-    # path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    # path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    # path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    # Página inicial / status
+    path('', index, name='index'),
+    path('status/', server_status, name='server-status'),
 
-    # Página de documentação alternativa
-    path('api-docs/', TemplateView.as_view(template_name='api_docs.html'), name='api-docs'),
+    # API pública / estatísticas
+    path(f'{API_PREFIX}', api_root, name='api-root'),
+    path(f'{API_PREFIX}system-stats/', system_stats, name='system_stats'),
+    path(f'{API_PREFIX}db-stats/', db_stats, name='db_stats'),
+    path(f'{API_PREFIX}health/', health_check, name='health_check'),
+    path(f'{API_PREFIX}global-stats/', global_statistics, name='global_statistics'),
 
-    # API Root
-    path(f'{api_prefix}', include('core.api_urls')),
+    # Autenticação (Djoser + JWT)
+    path(f'{API_PREFIX}auth/', include('djoser.urls')),
+    path(f'{API_PREFIX}auth/', include('djoser.urls.jwt')),
 
-    # Authentication
-    path(f'{api_prefix}auth/', include('djoser.urls')),
-    path(f'{api_prefix}auth/', include('djoser.urls.jwt')),
+    # Apps principais
+    path(f'{API_PREFIX}accounts/', include('apps.accounts.urls')),
+    path(f'{API_PREFIX}articles/', include('apps.articles.urls')),
+    path(f'{API_PREFIX}mangas/', include('apps.mangas.urls')),
+    path(f'{API_PREFIX}books/', include('apps.books.urls')),
+    path(f'{API_PREFIX}categories/', include('apps.categories.urls')),
 
-    # App URLs
-    path(f'{api_prefix}accounts/', include('apps.accounts.urls')),
-    path(f'{api_prefix}articles/', include('apps.articles.urls')),
-    path(f'{api_prefix}mangas/', include('apps.mangas.urls')),
-    path(f'{api_prefix}books/', include('apps.books.urls')),
-    path(f'{api_prefix}categories/', include('apps.categories.urls')),
-    path(f'{api_prefix}ratings/', include('apps.ratings.urls')),
-    path(f'{api_prefix}comments/', include('apps.comments.urls')),
+    # Documentação da API
+    path(f'{API_PREFIX}docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path(f'{API_PREFIX}redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
-# Add media URL in development
+# Servir arquivos de mídia no modo de desenvolvimento
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

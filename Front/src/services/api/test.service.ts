@@ -2,58 +2,34 @@
  * Serviço para testar a conexão com o backend
  */
 
-import { API_BASE_URL, API_ENDPOINTS, getDefaultHeaders, handleApiError } from './config';
+import { API_BASE_URL, getDefaultHeaders, handleApiError } from './config';
 
 /**
- * Interface para a resposta do endpoint de teste
+ * Interface para a resposta do endpoint de health check
  */
 export interface TestResponse {
   status: string;
-  message: string;
   timestamp: string;
+  components?: {
+    database?: {
+      status: string;
+      type: string;
+    };
+    api?: {
+      status: string;
+    };
+  };
 }
 
 /**
- * Testa a conexão com o backend
+ * Testa a conexão com o backend usando o endpoint de health check
  *
- * @returns {Promise<TestResponse>} Promise que resolve para a resposta do endpoint de teste
+ * @returns {Promise<TestResponse>} Promise que resolve para a resposta do endpoint de health check
  */
 export const testBackendConnection = async (): Promise<TestResponse> => {
   try {
-    // Tentar primeiro o endpoint de teste para mangás
-    try {
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.MANGAS.MANGAS_TEST}`, {
-        method: 'GET',
-        headers: getDefaultHeaders(),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Teste de conexão com o endpoint de mangás bem-sucedido:', data);
-        return data as TestResponse;
-      }
-    } catch (e) {
-      console.warn('Erro ao testar conexão com o endpoint de mangás:', e);
-    }
-
-    // Tentar o endpoint de teste para livros
-    try {
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.BOOKS.TEST}`, {
-        method: 'GET',
-        headers: getDefaultHeaders(),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Teste de conexão com o endpoint de livros bem-sucedido:', data);
-        return data as TestResponse;
-      }
-    } catch (e) {
-      console.warn('Erro ao testar conexão com o endpoint de livros:', e);
-    }
-
-    // Se falhar, tentar o endpoint de teste geral
-    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.MANGAS.TEST}`, {
+    // Usar o endpoint de health check
+    const response = await fetch(`${API_BASE_URL}/api/v1/health/`, {
       method: 'GET',
       headers: getDefaultHeaders(),
     });
@@ -76,8 +52,9 @@ export const testBackendConnection = async (): Promise<TestResponse> => {
  */
 export const isBackendAvailable = async (): Promise<boolean> => {
   try {
-    await testBackendConnection();
-    return true;
+    const response = await testBackendConnection();
+    // Verificar se o status é 'healthy' ou 'Online'
+    return response.status === 'healthy' || response.status === 'Online';
   } catch (error) {
     console.warn('Backend não está disponível:', error);
     return false;

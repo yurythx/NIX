@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Book, Headphones, Filter, Plus, Edit, Eye, Search, Star, TrendingUp, ChevronRight, Calendar, MessageSquare } from 'lucide-react';
+import { Book, Headphones, Filter, Plus, Edit, Eye, Search, Star, TrendingUp, ChevronRight, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import booksService, { Book as BookType } from '../../services/api/books.service';
 import { getCategories } from '../../utils/categoryFallback';
@@ -57,10 +57,6 @@ const FeaturedBookCard = ({ book, index, isAuthenticated, user, onDelete }: {
             <span className="flex items-center">
               <Eye className="w-4 h-4 mr-1" />
               {book.views_count || 0}
-            </span>
-            <span className="flex items-center">
-              <MessageSquare className="w-4 h-4 mr-1" />
-              {book.comments_count || 0}
             </span>
             {book.has_audio && (
               <span className="flex items-center">
@@ -140,10 +136,6 @@ const BookCard = ({ book, index, isAuthenticated, user, onDelete }: {
             <span className="book-meta-item">
               <Eye className="w-3 h-3" />
               {book.views_count || 0}
-            </span>
-            <span className="book-meta-item">
-              <MessageSquare className="w-3 h-3" />
-              {book.comments_count || 0}
             </span>
           </div>
           <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
@@ -227,8 +219,7 @@ const processClientSideBooks = (
     const query = search.toLowerCase();
     filteredResults = filteredResults.filter(book =>
       (book.title && book.title.toLowerCase().includes(query)) ||
-      (book.description && book.description.toLowerCase().includes(query)) ||
-      (book.category_name && book.category_name.toLowerCase().includes(query))
+      (book.description && book.description.toLowerCase().includes(query))
     );
   }
 
@@ -521,11 +512,6 @@ export default function LivrosPage() {
       return true;
     }
 
-    // Buscar na categoria
-    if (book.category_name && book.category_name.toLowerCase().includes(query)) {
-      return true;
-    }
-
     return false;
   };
 
@@ -601,7 +587,7 @@ export default function LivrosPage() {
       <div className="container mx-auto px-4 py-8 space-y-12">
         {/* Hero Section */}
       <motion.div
-        className="books-hero"
+        className="books-hero transition-colors"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -641,7 +627,7 @@ export default function LivrosPage() {
                 placeholder="Buscar livros..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600 transition-colors"
               />
             </div>
             <div className="relative">
@@ -661,25 +647,10 @@ export default function LivrosPage() {
                     setSearchQuery('');
                   }
                 }}
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-600 transition-colors"
               >
-                <option value="all">Todas as categorias</option>
+                <option value="all">Todos os livros</option>
                 <option value="audio">Com áudio</option>
-                {categories && categories.length > 0 ? (
-                  categories.map((category) => (
-                    <option key={category.id} value={category.name.toLowerCase()}>
-                      {category.name}
-                    </option>
-                  ))
-                ) : (
-                  <>
-                    <option value="ficção">Ficção</option>
-                    <option value="não-ficção">Não-Ficção</option>
-                    <option value="romance">Romance</option>
-                    <option value="fantasia">Fantasia</option>
-                    <option value="história">História</option>
-                  </>
-                )}
               </select>
             </div>
             {isAuthenticated && (
@@ -703,10 +674,10 @@ export default function LivrosPage() {
 
       {/* Livros Recentes */}
       {searchedBooksData.recentes.length > 0 && (
-        <section className="books-section">
+        <section className="books-section transition-colors">
           <div className="flex items-center justify-between mb-6">
             <motion.h2
-              className="section-title"
+              className="section-title transition-colors"
               initial={{ x: -20, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.2 }}

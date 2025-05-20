@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BookOpen, Star, Filter, Plus, Search, Clock, Tag, Edit, Eye, MessageSquare, TrendingUp, ChevronRight, Calendar, Trash2 } from 'lucide-react';
+import { BookOpen, Star, Filter, Plus, Search, Clock, Tag, Edit, Eye, TrendingUp, ChevronRight, Calendar, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import './styles/MangasPage.css';
 import mangasService from '../../services/api/mangas.service';
@@ -30,7 +30,6 @@ interface DisplayManga {
     slug: string;
   };
   views_count?: number;
-  comments_count?: number;
   author_id?: number;
   has_chapters?: boolean;
   featured?: boolean;
@@ -151,7 +150,6 @@ export default function MangasPage() {
             updated_at: manga.updated_at,
             category: manga.category,
             views_count: manga.views_count || 0,
-            comments_count: manga.comments_count || 0,
             author_id: manga.author_id,
             has_chapters: manga.chapters && manga.chapters.length > 0,
             featured: manga.featured || false
@@ -207,7 +205,6 @@ export default function MangasPage() {
             updated_at: '2023-09-20',
             category: { id: 5, name: 'Fantasia', slug: 'fantasia' },
             views_count: 1200,
-            comments_count: 45,
             has_chapters: true,
             featured: true
           },
@@ -223,7 +220,6 @@ export default function MangasPage() {
             updated_at: '2023-09-15',
             category: { id: 1, name: 'Ação', slug: 'acao' },
             views_count: 980,
-            comments_count: 32,
             has_chapters: true
           },
           {
@@ -238,7 +234,6 @@ export default function MangasPage() {
             updated_at: '2023-01-20',
             category: { id: 4, name: 'Drama', slug: 'drama' },
             views_count: 750,
-            comments_count: 28,
             has_chapters: true
           },
           {
@@ -253,7 +248,6 @@ export default function MangasPage() {
             updated_at: '2022-08-10',
             category: { id: 6, name: 'Sci-Fi', slug: 'sci-fi' },
             views_count: 1500,
-            comments_count: 60,
             has_chapters: true,
             featured: true
           }
@@ -308,7 +302,6 @@ export default function MangasPage() {
             updated_at: manga.updated_at,
             category: manga.category,
             views_count: manga.views_count || 0,
-            comments_count: manga.comments_count || 0,
             author_id: manga.author_id,
             has_chapters: manga.chapters && manga.chapters.length > 0,
             featured: manga.featured || false
@@ -333,24 +326,10 @@ export default function MangasPage() {
     fetchMangas();
   };
 
-  // Função auxiliar para filtrar mangás por categoria
+  // Função auxiliar para filtrar mangás
   const filterMangaByCategory = (manga: DisplayManga) => {
-    if (filter === 'all') return true;
-
-    // Verificar se o mangá tem categoria
-    if (manga.category) {
-      // Verificar pelo slug da categoria
-      if (manga.category.slug && manga.category.slug.toLowerCase() === filter.toLowerCase()) {
-        return true;
-      }
-
-      // Verificar pelo nome da categoria
-      if (manga.category.name && manga.category.name.toLowerCase() === filter.toLowerCase()) {
-        return true;
-      }
-    }
-
-    return false;
+    // Retornar todos os mangás, sem filtro por categoria
+    return true;
   };
 
   // Aplicar filtro às categorias
@@ -376,13 +355,6 @@ export default function MangasPage() {
       return true;
     }
 
-    // Buscar na categoria
-    if (manga.category) {
-      if (manga.category.name && manga.category.name.toLowerCase().includes(query)) {
-        return true;
-      }
-    }
-
     return false;
   };
 
@@ -397,7 +369,7 @@ export default function MangasPage() {
     <div className="container mx-auto px-4 py-8 space-y-12">
       {/* Hero Section */}
       <motion.div
-        className="mangas-hero"
+        className="mangas-hero transition-colors"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
@@ -437,7 +409,7 @@ export default function MangasPage() {
                 placeholder="Buscar mangás..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 transition-colors"
               />
             </div>
             <div className="relative">
@@ -447,26 +419,9 @@ export default function MangasPage() {
               <select
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600"
+                className="block w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-600 transition-colors"
               >
-                <option value="all">Todas as categorias</option>
-                {categories && categories.length > 0 ? (
-                  categories.map((category) => (
-                    <option key={category.id} value={category.slug}>
-                      {category.name}
-                    </option>
-                  ))
-                ) : (
-                  <>
-                    <option value="acao">Ação</option>
-                    <option value="aventura">Aventura</option>
-                    <option value="comedia">Comédia</option>
-                    <option value="drama">Drama</option>
-                    <option value="fantasia">Fantasia</option>
-                    <option value="sci-fi">Sci-Fi</option>
-                    <option value="slice-of-life">Slice of Life</option>
-                  </>
-                )}
+                <option value="all">Todos os mangás</option>
               </select>
             </div>
             {isAuthenticated && (
@@ -499,8 +454,8 @@ export default function MangasPage() {
         <>
           {/* Seção de Mangás em Destaque */}
           {searchedMangasData.destaques.length > 0 && (
-            <section className="mangas-section">
-              <h2 className="section-title">
+            <section className="mangas-section transition-colors">
+              <h2 className="section-title transition-colors">
                 <Star className="section-icon" />
                 Mangás em Destaque
               </h2>
@@ -540,10 +495,6 @@ export default function MangasPage() {
                           <span className="flex items-center">
                             <Eye className="w-4 h-4 mr-1" />
                             {manga.views_count || 0}
-                          </span>
-                          <span className="flex items-center">
-                            <MessageSquare className="w-4 h-4 mr-1" />
-                            {manga.comments_count || 0}
                           </span>
                         </div>
                         <Link href={`/mangas/${manga.slug}`} className="text-white hover:text-purple-300 transition-colors">
@@ -616,10 +567,6 @@ export default function MangasPage() {
                             <Eye className="w-3 h-3" />
                             {manga.views_count || 0}
                           </span>
-                          <span className="manga-meta-item">
-                            <MessageSquare className="w-3 h-3" />
-                            {manga.comments_count || 0}
-                          </span>
                         </div>
                         {isAuthenticated && user && (
                           (user.is_superuser || (manga.author_id && String(user.id) === String(manga.author_id)))
@@ -682,10 +629,6 @@ export default function MangasPage() {
                           <span className="manga-meta-item">
                             <Eye className="w-3 h-3" />
                             {manga.views_count || 0}
-                          </span>
-                          <span className="manga-meta-item">
-                            <MessageSquare className="w-3 h-3" />
-                            {manga.comments_count || 0}
                           </span>
                         </div>
                         {isAuthenticated && user && (

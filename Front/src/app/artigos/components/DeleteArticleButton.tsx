@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 import * as articlesService from '../../../services/api/articles.service';
 import { useNotification } from '../../../contexts/NotificationContext';
+import ConfirmationModal from '../../../components/common/ConfirmationModal';
 
 interface DeleteArticleButtonProps {
   slug: string;
@@ -26,8 +27,12 @@ export default function DeleteArticleButton({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const handleDelete = async () => {
+  // Usar useCallback para evitar recriações desnecessárias da função
+  const handleDelete = useCallback(async () => {
+    if (isDeleting || isRedirecting) return;
+
     try {
       setIsDeleting(true);
       setError(null);
@@ -40,109 +45,78 @@ export default function DeleteArticleButton({
 
       await articlesService.deleteArticle(slug);
 
-      // Mostrar notificação de sucesso com mais detalhes
-      showNotification('success', `Artigo "${slug}" excluído com sucesso! Redirecionando para a lista de artigos...`);
+      // Mostrar notificação de sucesso
+      showNotification('success', `Artigo "${slug}" excluído com sucesso!`);
 
-      // Executar callback ou redirecionar
-      if (onDelete) {
-        onDelete();
-      } else {
-        // Redirecionar para a lista de artigos após excluir
-        router.push('/artigos');
-      }
+      // Fechar o modal
+      setShowConfirmation(false);
+
+      // Marcar que estamos redirecionando para evitar múltiplas chamadas
+      setIsRedirecting(true);
+
+      // Aumentar o atraso antes de redirecionar para garantir que a animação do modal termine
+      setTimeout(() => {
+        // Executar callback ou redirecionar
+        if (onDelete) {
+          onDelete();
+        } else {
+          // Redirecionar para a lista de artigos após excluir
+          console.log('Redirecionando para /artigos após exclusão');
+
+          // Usar apenas router.push para evitar o piscar da tela
+          router.push('/artigos');
+        }
+      }, 500);
     } catch (err: any) {
       console.error('Erro ao excluir artigo:', err);
       const errorMessage = err.message || 'Ocorreu um erro ao excluir o artigo. Por favor, tente novamente.';
       setError(errorMessage);
       showNotification('error', errorMessage);
-      setShowConfirmation(false);
-    } finally {
       setIsDeleting(false);
     }
-  };
+  }, [slug, isDeleting, isRedirecting, onDelete, router, showNotification]);
+
+  // Manipulador para abrir o modal
+  const handleOpenModal = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowConfirmation(true);
+  }, []);
+
+  // Manipulador para fechar o modal
+  const handleCloseModal = useCallback(() => {
+    if (!isDeleting) {
+      setShowConfirmation(false);
+    }
+  }, [isDeleting]);
 
   return (
     <>
       <button
         type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setShowConfirmation(true);
-        }}
+        onClick={handleOpenModal}
         className={`${className || 'text-red-600 hover:text-red-800 focus:outline-none'}`}
         title="Excluir artigo"
         aria-label="Excluir artigo"
         aria-haspopup="dialog"
+        disabled={isDeleting || isRedirecting}
       >
         {showIcon && <Trash2 className="w-5 h-5 inline mr-1" aria-hidden="true" />}
         {buttonText}
       </button>
 
-      {/* Modal de confirmação */}
-      {showConfirmation && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setShowConfirmation(false);
-          }}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-confirmation-title"
-        >
-          <div
-            className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-            role="document"
-          >
-            <h3
-              id="delete-confirmation-title"
-              className="text-lg font-medium text-gray-900 dark:text-white mb-4"
-            >
-              Confirmar exclusão
-            </h3>
-
-            <p className="text-gray-700 dark:text-gray-300 mb-6">
-              Tem certeza que deseja excluir este artigo? Esta ação não pode ser desfeita.
-            </p>
-
-            {error && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-                {error}
-              </div>
-            )}
-
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowConfirmation(false);
-                }}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
-                disabled={isDeleting}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleDelete();
-                }}
-                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
-                disabled={isDeleting}
-              >
-                {isDeleting ? 'Excluindo...' : 'Excluir'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmationModal
+        isOpen={showConfirmation}
+        onClose={handleCloseModal}
+        onConfirm={handleDelete}
+        title="Confirmar exclusão"
+        message="Tem certeza que deseja excluir este artigo? Esta ação não pode ser desfeita."
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        isLoading={isDeleting}
+        error={error}
+        confirmButtonClass="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+      />
     </>
   );
 }

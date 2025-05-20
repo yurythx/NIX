@@ -68,9 +68,7 @@ const FeaturedArticleCard = ({ article, index, isAuthenticated, user, onDelete }
         </div>
       </div>
 
-      {isAuthenticated && user && (
-        (user.is_superuser || (article.author_id && String(user.id) === String(article.author_id)))
-      ) && (
+      {isAuthenticated && (
         <div className="absolute top-2 right-2 flex space-x-2 z-30" onClick={(e) => e.stopPropagation()}>
           <Link href={`/artigos/${article.slug}/editar`} className="p-2 bg-white/80 hover:bg-indigo-600 hover:text-white rounded-full transition-colors">
             <Edit className="w-4 h-4" />
@@ -140,9 +138,7 @@ const ArticleCard = ({ article, index, isAuthenticated, user, onDelete }: {
             </span>
           </div>
           <div className="flex items-center space-x-2" onClick={(e) => e.stopPropagation()}>
-            {isAuthenticated && user && (
-              (user.is_superuser || (article.author_id && String(user.id) === String(article.author_id)))
-            ) && (
+            {isAuthenticated && (
               <>
                 <Link href={`/artigos/${article.slug}/editar`} className="p-1 text-gray-500 hover:text-indigo-600 dark:text-gray-400 dark:hover:text-indigo-400">
                   <Edit className="w-4 h-4" />

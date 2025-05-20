@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CommentCreateData } from '../../types/models';
 import { articlesService } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotification } from '../../contexts/NotificationContext';
+import { useConfig } from '../../contexts/ConfigContext';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface CommentFormProps {
   articleId: number;
@@ -25,6 +27,9 @@ const CommentForm: React.FC<CommentFormProps> = ({
 }) => {
   const { user } = useAuth();
   const { showNotification } = useNotification();
+  const { config } = useConfig();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
   const [formData, setFormData] = useState<CommentCreateData>({
     name: '',
     email: '',
@@ -32,11 +37,13 @@ const CommentForm: React.FC<CommentFormProps> = ({
     article: articleId,
     article_slug: articleSlug,
     parent: parentId,
+    captcha_token: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastSubmitTime, setLastSubmitTime] = useState<number | null>(null);
   const [honeypot, setHoneypot] = useState<string>(''); // Campo honeypot para detectar bots
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   // Preencher o nome e email com os dados do usuário logado, se disponível
   // Verificar configurações de comentários
@@ -97,6 +104,17 @@ const CommentForm: React.FC<CommentFormProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Função para lidar com a verificação do captcha
+  const handleCaptchaChange = (token: string | null) => {
+    if (token) {
+      setCaptchaVerified(true);
+      setFormData(prev => ({ ...prev, captcha_token: token }));
+    } else {
+      setCaptchaVerified(false);
+      setFormData(prev => ({ ...prev, captcha_token: '' }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -135,6 +153,12 @@ const CommentForm: React.FC<CommentFormProps> = ({
     const now = Date.now();
     if (lastSubmitTime && now - lastSubmitTime < 30000) {
       setError('Por favor, aguarde 30 segundos antes de enviar outro comentário.');
+      return;
+    }
+
+    // Verificar captcha se estiver configurado
+    if (config?.RECAPTCHA_SITE_KEY && !formData.captcha_token) {
+      setError('Por favor, complete a verificação de captcha.');
       return;
     }
 
@@ -284,6 +308,23 @@ const CommentForm: React.FC<CommentFormProps> = ({
         />
       </div>
 
+      {/* Captcha - mostrar apenas se estiver configurado */}
+      {config?.RECAPTCHA_SITE_KEY && (
+        <div className="mt-4">
+          <ReCAPTCHA
+            ref={recaptchaRef}
+            sitekey={config.RECAPTCHA_SITE_KEY}
+            onChange={handleCaptchaChange}
+            theme={config.THEME === 'dark' ? 'dark' : 'light'}
+          />
+          {!captchaVerified && formData.text.length > 0 && (
+            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              Por favor, complete a verificação de captcha antes de enviar.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
         <div className="mb-3 sm:mb-0">
           <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
@@ -303,7 +344,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
           )}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || (config?.RECAPTCHA_SITE_KEY && !captchaVerified)}
             className="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 flex-grow sm:flex-grow-0"
           >
             {isSubmitting ? 'Enviando...' : isReply ? 'Responder' : 'Enviar Comentário'}

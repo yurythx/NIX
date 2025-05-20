@@ -108,6 +108,9 @@ export default function ArticleForm({ article, onSuccess }: ArticleFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted');
+    console.log('Title:', title);
+    console.log('Content:', content);
 
     if (!title.trim() || !content.trim()) {
       setError('Por favor, preencha todos os campos.');
@@ -127,15 +130,19 @@ export default function ArticleForm({ article, onSuccess }: ArticleFormProps) {
           featured: featured
         };
 
+        console.log('Updating article with data:', data);
+
         // Adicionar imagem de capa se houver
         if (coverImage) {
           data.cover_image = coverImage;
         }
 
         const updatedArticle = await articlesService.updateArticle(article.slug, data);
+        console.log('Article updated successfully:', updatedArticle);
 
         showNotification('success', 'Artigo atualizado com sucesso!');
 
+        // Redirecionar para a página de detalhes do artigo
         if (onSuccess) {
           onSuccess();
         } else {
@@ -205,7 +212,7 @@ export default function ArticleForm({ article, onSuccess }: ArticleFormProps) {
         <RichTextEditor
           value={content}
           onChange={setContent}
-          height={400}
+          height={300} // Altura reduzida para o editor original (que agora está oculto por padrão)
           placeholder="Digite o conteúdo do artigo..."
         />
       </div>

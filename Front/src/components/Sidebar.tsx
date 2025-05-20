@@ -191,11 +191,74 @@ export default function Sidebar({
     },
   ];
 
-  // Não renderizar a barra lateral, apenas retornar null
-  return null;
+  return (
+    <motion.aside
+      initial={{ width: isCollapsed ? 80 : 280 }}
+      animate={{ width: isCollapsed ? 80 : 280 }}
+      className={`h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col fixed top-0 left-0 z-40 transition-colors duration-300 ${
+        isCollapsed ? 'w-20' : 'w-72'
+      }`}
+    >
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 transition-colors">
+        <Link href="/" className="flex items-center">
+          {!isCollapsed && (
+            <span className="text-xl font-semibold text-gray-800 dark:text-white ml-2 transition-colors">
+              NIX
+            </span>
+          )}
+        </Link>
+        <button
+          onClick={toggleSidebar}
+          className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+        >
+          {isCollapsed ? (
+            <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-400 transition-colors" />
+          ) : (
+            <ChevronLeft className="w-5 h-5 text-gray-500 dark:text-gray-400 transition-colors" />
+          )}
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto py-4 px-3 transition-colors">
+        <ul className="space-y-2">
+          {mainMenuItems
+            .filter(item => !item.requiresAuth || isAuthenticated)
+            .filter(
+              item => !item.requiresAdmin || (user && user.email === 'admin@example.com')
+            )
+            .map((item, index) => (
+              <li key={index}>
+                <Link
+                  href={item.href}
+                  className={`flex items-center p-2 rounded-lg ${
+                    pathname === item.href
+                      ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200'
+                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  } transition-colors`}
+                >
+                  <div className="min-w-[28px]">{item.icon}</div>
+                  {!isCollapsed && <span className="ml-3">{item.label}</span>}
+                </Link>
+              </li>
+            ))}
+        </ul>
+
+        <div className="pt-4 mt-4 space-y-4 border-t border-gray-200 dark:border-gray-700 transition-colors">
+          {Object.entries(menuItems).map(([key, section]) => (
+            <SubMenu
+              key={key}
+              title={section.title}
+              icon={section.icon}
+              items={section.items}
+              isCollapsed={isCollapsed}
+              currentPath={pathname}
+            />
+          ))}
+        </div>
+      </div>
 
       {isAuthenticated && (
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-t border-gray-200 dark:border-gray-700 transition-colors">
           <Link href="/perfil">
             <motion.div
               whileHover={{ scale: 1.02 }}

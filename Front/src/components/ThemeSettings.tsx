@@ -84,7 +84,7 @@ export default function ThemeSettings() {
     <div className="relative" ref={settingsRef}>
       <button
         onClick={toggleOpen}
-        className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-700 shadow-lg transition-all hover:shadow-xl hover:scale-105 group"
+        className="p-2 rounded-full bg-gray-800 hover:bg-gray-700 border border-gray-700 shadow-lg transition-all hover:shadow-xl hover:scale-105 group transition-colors"
         aria-label="Personalizar tema"
         title="Personalizar tema"
       >

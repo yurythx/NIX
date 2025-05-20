@@ -47,30 +47,56 @@ export default function LoginPage() {
           transition={{ delay: 0.3, duration: 0.5 }}
           className="relative z-10"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Bem-vindo ao Projeto Prometheus</h1>
-          <p className="text-xl text-indigo-100 mb-8 max-w-md">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              Bem-vindo ao
+            </motion.span>{" "}
+            <motion.span
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+              className="relative"
+            >
+              <span className="relative z-10">NIX</span>
+              <span className="absolute -bottom-2 left-0 right-0 h-3 bg-purple-500 opacity-30 z-0 transform -rotate-1"></span>
+            </motion.span>
+          </h1>
+          <motion.p
+            className="text-xl text-indigo-100 mb-8 max-w-md"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+          >
             Sua plataforma para explorar conteúdo de qualidade sobre tecnologia, cultura e muito mais.
-          </p>
+          </motion.p>
 
           <div className="space-y-4">
-            <div className="flex items-center text-white">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mr-4">
-                <ChevronRight className="w-6 h-6 text-white" />
-              </div>
-              <p className="text-lg">Acesso a conteúdo exclusivo</p>
-            </div>
-            <div className="flex items-center text-white">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mr-4">
-                <ChevronRight className="w-6 h-6 text-white" />
-              </div>
-              <p className="text-lg">Salve seus artigos favoritos</p>
-            </div>
-            <div className="flex items-center text-white">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mr-4">
-                <ChevronRight className="w-6 h-6 text-white" />
-              </div>
-              <p className="text-lg">Participe da comunidade</p>
-            </div>
+            {[
+              { text: "Acesso a conteúdo exclusivo", delay: 0.8 },
+              { text: "Crie e edite conteúdo", delay: 0.9 },
+              { text: "Compartilhe conhecimento", delay: 1.0 }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                className="flex items-center text-white"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: item.delay, duration: 0.5 }}
+              >
+                <motion.div
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-white/20 mr-4"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.3)" }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronRight className="w-6 h-6 text-white" />
+                </motion.div>
+                <p className="text-lg">{item.text}</p>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
 

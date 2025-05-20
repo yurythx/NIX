@@ -1,6 +1,6 @@
-# Viixen Backend
+# NIX Backend
 
-Este é o backend do projeto Viixen, desenvolvido com Django e Django REST Framework.
+Este é o backend do projeto NIX, desenvolvido com Django e Django REST Framework.
 
 ## Arquitetura do Projeto
 

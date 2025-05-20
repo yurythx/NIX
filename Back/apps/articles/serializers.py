@@ -1,11 +1,15 @@
 from rest_framework import serializers
-from .models import Article, Comment, Tag
+from .models import Article, Tag, Comment
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from apps.categories.serializers import CategorySerializer
 from apps.categories.models import Category
+import requests
+import logging
+from django.conf import settings
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,104 +17,9 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'slug', 'created_at']
         read_only_fields = ['id', 'slug', 'created_at']
 
-class RecursiveCommentSerializer(serializers.Serializer):
-    """Para serializar recursivamente respostas dos comentários"""
-    def to_representation(self, value):
-        serializer = CommentSerializer(value, context=self.context)
-        return serializer.data
 
-class CommentSerializer(serializers.ModelSerializer):
-    replies = RecursiveCommentSerializer(many=True, read_only=True)
-    article_slug = serializers.CharField(write_only=True)
-    parent_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
-    reply_count = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Comment
-        fields = [
-            'id', 'name', 'email', 'text', 'created_at', 'updated_at',
-            'replies', 'reply_count', 'parent', 'article_slug', 'parent_id',
-            'is_approved', 'is_spam'
-        ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'parent', 'is_approved', 'is_spam']
-        ref_name = "ArticlesCommentSerializer"
-
-    def get_reply_count(self, obj):
-        """Retorna o número de respostas aprovadas para este comentário."""
-        return obj.replies.filter(is_approved=True, is_spam=False).count()
-
-    def validate(self, data):
-        article_slug = data.get('article_slug')
-        parent_id = data.get('parent_id')
-
-        # Validar que o artigo existe
-        try:
-            article = Article.objects.get(slug=article_slug)
-        except Article.DoesNotExist:
-            raise serializers.ValidationError({'article_slug': 'Artigo não encontrado.'})
-
-        # Validar que o parent existe e pertence ao mesmo artigo
-        if parent_id:
-            try:
-                parent = Comment.objects.get(id=parent_id)
-                if parent.article.slug != article_slug:
-                    raise serializers.ValidationError({'parent_id': 'O comentário pai deve pertencer ao mesmo artigo.'})
-            except Comment.DoesNotExist:
-                raise serializers.ValidationError({'parent_id': 'Comentário pai não encontrado.'})
-
-        return data
-
-    def create(self, validated_data):
-        article_slug = validated_data.pop('article_slug')
-        parent_id = validated_data.pop('parent_id', None)
-
-        # Obter o artigo
-        article = Article.objects.get(slug=article_slug)
-        validated_data['article'] = article
-
-        # Definir o comentário pai, se existir
-        if parent_id:
-            try:
-                parent_comment = Comment.objects.get(id=parent_id)
-                # Verificar se o comentário pai pertence ao mesmo artigo
-                if parent_comment.article_id != article.id:
-                    raise serializers.ValidationError({'parent_id': 'O comentário pai deve pertencer ao mesmo artigo.'})
-                validated_data['parent'] = parent_comment
-            except Comment.DoesNotExist:
-                raise serializers.ValidationError({'parent_id': 'Comentário pai não encontrado.'})
-
-        # Capturar informações do request, se disponível
-        request = self.context.get('request')
-        if request:
-            # Capturar IP e User Agent
-            validated_data['ip_address'] = self.get_client_ip(request)
-            validated_data['user_agent'] = request.META.get('HTTP_USER_AGENT', '')
-
-            # Verificar se o comentário deve ser aprovado automaticamente
-            # Por padrão, todos os comentários são aprovados (is_approved=True)
-            # Aqui podemos implementar regras para moderação automática
-
-            # Exemplo: comentários com certas palavras podem ser marcados para moderação
-            text = validated_data.get('text', '').lower()
-            spam_words = ['spam', 'viagra', 'casino', 'http://', 'https://']  # Exemplo básico
-            if any(word in text for word in spam_words):
-                validated_data['is_approved'] = False
-                validated_data['is_spam'] = True
-
-        return super().create(validated_data)
-
-    def get_client_ip(self, request):
-        """Obtém o endereço IP real do cliente, considerando proxies."""
-        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-        if x_forwarded_for:
-            ip = x_forwarded_for.split(',')[0]
-        else:
-            ip = request.META.get('REMOTE_ADDR')
-        return ip
 
 class ArticleSerializer(serializers.ModelSerializer):
-    comments = serializers.SerializerMethodField()
-    comments_count = serializers.SerializerMethodField()
     category = CategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(
         queryset=Category.objects.all(),
@@ -155,17 +64,9 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'slug', 'content', 'created_at', 'updated_at',
             'views_count', 'featured', 'category', 'category_id', 'tags',
-            'tag_names', 'comments', 'comments_count', 'cover_image', 'is_favorite'
+            'tag_names', 'cover_image', 'is_favorite'
         ]
-        read_only_fields = ['id', 'slug', 'created_at', 'updated_at', 'views_count', 'comments_count', 'is_favorite']
-
-    def get_comments(self, obj):
-        # Retornar apenas comentários de alto nível (sem parent)
-        top_level_comments = obj.comments.filter(parent=None)
-        return CommentSerializer(top_level_comments, many=True, context=self.context).data
-
-    def get_comments_count(self, obj):
-        return obj.comments.count()
+        read_only_fields = ['id', 'slug', 'created_at', 'updated_at', 'views_count', 'is_favorite']
 
     def get_is_favorite(self, obj):
         request = self.context.get('request')
@@ -265,3 +166,99 @@ class ArticleSerializer(serializers.ModelSerializer):
                     defaults={'name': tag_name}
                 )
                 article.tags.add(tag)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    replies = serializers.SerializerMethodField()
+    captcha_token = serializers.CharField(write_only=True, required=False)
+    depth = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'article', 'article_slug', 'name', 'email', 'text',
+            'created_at', 'updated_at', 'is_approved', 'is_spam',
+            'parent', 'replies', 'captcha_token', 'depth'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'is_approved', 'is_spam', 'ip_address', 'user_agent']
+
+    def get_replies(self, obj):
+        if obj.replies.exists():
+            return CommentSerializer(obj.replies.all(), many=True).data
+        return []
+
+    def get_depth(self, obj):
+        return obj.get_depth()
+
+    def validate(self, data):
+        # Validar campos obrigatórios
+        if not data.get('name'):
+            raise serializers.ValidationError({"name": "O nome é obrigatório."})
+
+        if not data.get('text'):
+            raise serializers.ValidationError({"text": "O texto do comentário é obrigatório."})
+
+        # Validar captcha se estiver configurado
+        captcha_token = data.get('captcha_token')
+        if hasattr(settings, 'RECAPTCHA_SECRET_KEY') and settings.RECAPTCHA_SECRET_KEY:
+            if not captcha_token:
+                raise serializers.ValidationError({"captcha_token": "Verificação de captcha é obrigatória."})
+
+            # Verificar o token do captcha
+            try:
+                response = requests.post(
+                    'https://www.google.com/recaptcha/api/siteverify',
+                    data={
+                        'secret': settings.RECAPTCHA_SECRET_KEY,
+                        'response': captcha_token
+                    }
+                )
+                result = response.json()
+
+                if not result.get('success', False):
+                    logger.warning(f"Falha na validação do captcha: {result}")
+                    raise serializers.ValidationError({"captcha_token": "Falha na verificação do captcha."})
+            except Exception as e:
+                logger.error(f"Erro ao verificar captcha: {str(e)}")
+                # Em ambiente de desenvolvimento, podemos permitir mesmo com erro
+                if not settings.DEBUG:
+                    raise serializers.ValidationError({"captcha_token": "Erro ao verificar captcha."})
+
+        # Validar hierarquia de comentários (máximo de 3 níveis)
+        parent = data.get('parent')
+        if parent:
+            depth = parent.get_depth()
+            if depth >= 2:  # Permitir até 3 níveis (0, 1, 2)
+                raise serializers.ValidationError({"parent": "Limite de profundidade de comentários excedido."})
+
+        return data
+
+    def create(self, validated_data):
+        # Remover o token do captcha antes de salvar
+        validated_data.pop('captcha_token', None)
+
+        # Obter informações do request
+        request = self.context.get('request')
+        if request:
+            validated_data['ip_address'] = self.get_client_ip(request)
+            validated_data['user_agent'] = request.META.get('HTTP_USER_AGENT', '')
+
+        # Se article_slug for fornecido, mas article não, tente encontrar o artigo pelo slug
+        article_slug = validated_data.get('article_slug')
+        if article_slug and not validated_data.get('article'):
+            try:
+                article = Article.objects.get(slug=article_slug)
+                validated_data['article'] = article
+            except Article.DoesNotExist:
+                pass
+
+        return super().create(validated_data)
+
+    def get_client_ip(self, request):
+        """Obtém o endereço IP real do cliente, considerando proxies"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip

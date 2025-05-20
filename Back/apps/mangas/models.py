@@ -115,18 +115,6 @@ class ReadingProgress(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.manga.title} - Capítulo {self.chapter.number}"
 
-class Comment(models.Model):
-    user = models.ForeignKey(User, related_name='manga_comments', on_delete=models.CASCADE)
-    chapter = models.ForeignKey(Chapter, related_name='comments', on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return f"Comentário de {self.user.username} em {self.chapter}"
-
 class UserStatistics(models.Model):
     user = models.OneToOneField(User, related_name='manga_statistics', on_delete=models.CASCADE)
     total_chapters_read = models.PositiveIntegerField(default=0)

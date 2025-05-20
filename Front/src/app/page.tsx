@@ -9,7 +9,6 @@ import { motion } from 'framer-motion';
 import * as articlesService from '../services/api/articles.service';
 import './styles/HomePage.css';
 import './artigos/styles/ArticlesPage.css';
-import BackendConnectionTest from '@/components/common/BackendConnectionTest';
 
 // Tipos para os artigos e estatísticas
 interface ArticleStats {
@@ -299,10 +298,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Teste de conexão com o backend */}
-      <div className="mb-8">
-        <BackendConnectionTest />
-      </div>
+
 
       {/* Hero Section */}
       <motion.div

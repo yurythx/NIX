@@ -7,7 +7,7 @@ import ClientLayout from '../components/ClientLayout';
 import ThemeScript from '../components/ThemeScript';
 
 export const metadata: Metadata = {
-  title: 'Projeto Prometheus',
+  title: 'NIX',
   description: 'Plataforma de gerenciamento de conteúdo',
 };
 

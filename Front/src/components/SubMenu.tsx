@@ -40,14 +40,14 @@ export default function SubMenu({ title, icon, items }: SubMenuProps) {
     <div className="space-y-2">
       <button
         onClick={handleClick}
-        className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+        className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors bg-white dark:bg-gray-800"
       >
         <div className="flex items-center gap-3">
-          <span className="text-indigo-500 dark:text-indigo-400">
+          <span className="text-indigo-500 dark:text-indigo-400 transition-colors">
             {icon}
           </span>
           {!isCollapsed && (
-            <span className="font-medium text-gray-700 dark:text-gray-200">
+            <span className="font-medium text-gray-700 dark:text-gray-200 transition-colors">
               {title}
             </span>
           )}
@@ -57,7 +57,7 @@ export default function SubMenu({ title, icon, items }: SubMenuProps) {
             animate={{ rotate: isOpen ? 180 : 0 }}
             transition={{ duration: 0.2 }}
           >
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 transition-colors" />
           </motion.div>
         )}
       </button>
@@ -87,4 +87,4 @@ export default function SubMenu({ title, icon, items }: SubMenuProps) {
       </AnimatePresence>
     </div>
   );
-} 
+}

@@ -9,10 +9,10 @@ from django.db.models import F
 from django.http import JsonResponse, HttpResponse, FileResponse
 from django.conf import settings
 from django.core.cache import cache
-from .models import Manga, Chapter, Page, ReadingProgress, Comment, UserStatistics, MangaView
+from .models import Manga, Chapter, Page, ReadingProgress, UserStatistics, MangaView
 from .serializers import (
     MangaSerializer, ChapterSerializer, PageSerializer,
-    ReadingProgressSerializer, CommentSerializer, UserSerializer,
+    ReadingProgressSerializer, UserSerializer,
     UserStatisticsSerializer, MangaViewSerializer
 )
 import os
@@ -31,7 +31,7 @@ class MangaViewSet(viewsets.ModelViewSet):
     pagination_class = DefaultPagination
     permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'description', 'author', 'genres']
+    search_fields = ['title', 'description', 'author']
     ordering_fields = ['created_at', 'title']
     ordering = ['-created_at']
 
@@ -320,29 +320,6 @@ class ChapterViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
-    def comment(self, request, pk=None):
-        chapter = self.get_object()
-        serializer = CommentSerializer(data=request.data, context={'request': request})
-
-        if serializer.is_valid():
-            serializer.save(user=request.user, chapter=chapter)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=True, methods=['get'])
-    def comments(self, request, pk=None):
-        chapter = self.get_object()
-        comments = Comment.objects.filter(chapter=chapter)
-        page = self.paginate_queryset(comments)
-        serializer = CommentSerializer(page, many=True)
-        return self.get_paginated_response(serializer.data)
-
-class PageViewSet(viewsets.ModelViewSet):
-    queryset = Page.objects.all()
-    serializer_class = PageSerializer
-    pagination_class = DefaultPagination
-    permission_classes = [IsAuthenticatedOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['chapter']
     ordering_fields = ['page_number']
@@ -604,94 +581,3 @@ def get_pdf_info(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def test_endpoint(request):
-    """
-    Endpoint de teste para verificar se o servidor está funcionando
-    """
-    from django.utils import timezone
-    return JsonResponse({
-        'status': 'success',
-        'message': 'O servidor está funcionando corretamente',
-        'timestamp': timezone.now().isoformat()
-    })
-
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def test_mangas_endpoint(request):
-    """
-    Endpoint de teste para retornar dados simulados de mangás
-    """
-    from django.utils import timezone
-
-    page = int(request.GET.get('page', 1))
-    page_size = int(request.GET.get('page_size', 10))
-
-    # Dados simulados
-    mock_mangas = [
-        {
-            'id': 1,
-            'title': 'Akira',
-            'slug': 'akira',
-            'description': 'Um clássico da ficção científica japonesa',
-            'author': 'Katsuhiro Otomo',
-            'genres': 'Sci-Fi, Ação, Cyberpunk',
-            'status': 'completed',
-            'status_display': 'Completo',
-            'created_at': '2023-01-01T00:00:00Z',
-            'views_count': 2500,
-            'is_favorite': False,
-            'chapters': [],
-            'reading_progress': None
-        },
-        {
-            'id': 2,
-            'title': 'One Piece',
-            'slug': 'one-piece',
-            'description': 'A história segue as aventuras de Monkey D. Luffy',
-            'author': 'Eiichiro Oda',
-            'genres': 'Aventura, Ação, Fantasia',
-            'status': 'ongoing',
-            'status_display': 'Em andamento',
-            'created_at': '2023-01-02T00:00:00Z',
-            'views_count': 2000,
-            'is_favorite': False,
-            'chapters': [],
-            'reading_progress': None
-        },
-        {
-            'id': 3,
-            'title': 'Naruto',
-            'slug': 'naruto',
-            'description': 'A história de um jovem ninja',
-            'author': 'Masashi Kishimoto',
-            'genres': 'Ação, Aventura',
-            'status': 'completed',
-            'status_display': 'Completo',
-            'created_at': '2023-01-03T00:00:00Z',
-            'views_count': 1500,
-            'is_favorite': False,
-            'chapters': [],
-            'reading_progress': None
-        }
-    ]
-
-    # Calcular paginação
-    total_mangas = len(mock_mangas)
-    total_pages = (total_mangas + page_size - 1) // page_size
-    start_idx = (page - 1) * page_size
-    end_idx = min(start_idx + page_size, total_mangas)
-
-    # Obter resultados paginados
-    results = mock_mangas[start_idx:end_idx]
-
-    # Construir resposta paginada
-    response_data = {
-        'count': total_mangas,
-        'next': f'/api/v1/mangas/mangas-test/?page={page+1}' if page < total_pages else None,
-        'previous': f'/api/v1/mangas/mangas-test/?page={page-1}' if page > 1 else None,
-        'results': results
-    }
-
-    return JsonResponse(response_data)

@@ -14,7 +14,7 @@ interface PermissionGuardProps {
 
 /**
  * Componente para verificar permissões de acesso
- * 
+ *
  * @param children - Conteúdo a ser renderizado se o usuário tiver permissão
  * @param requiredPermission - Permissão necessária ('admin', 'author', 'authenticated')
  * @param resourceOwnerId - ID do proprietário do recurso (para verificar se o usuário é o autor)
@@ -45,10 +45,8 @@ export default function PermissionGuard({
           permitted = isAuthenticated && user?.is_staff === true;
           break;
         case 'author':
-          permitted = isAuthenticated && (
-            user?.is_staff === true || // Admins can edit anything
-            (resourceOwnerId !== undefined && user?.id.toString() === resourceOwnerId.toString())
-          );
+          // Qualquer usuário autenticado pode editar qualquer conteúdo
+          permitted = isAuthenticated;
           break;
       }
 

@@ -4,7 +4,7 @@ import { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Book, Upload, Headphones } from 'lucide-react';
 import Link from 'next/link';
-import { getBookBySlug, updateBook } from '../../../../services/api/books.service';
+import booksService from '../../../../services/api/books.service';
 import { getCategories } from '../../../../utils/categoryFallback';
 import { useNotification } from '../../../../contexts/NotificationContext';
 import { useAuth } from '../../../../contexts/AuthContext';
@@ -47,7 +47,7 @@ export default function EditBookPage() {
 
         // Buscar livro e categorias em paralelo
         const [bookData, categoriesData] = await Promise.all([
-          getBookBySlug(slug as string),
+          booksService.getBookBySlug(slug as string),
           getCategories()
         ]);
 
@@ -184,7 +184,7 @@ export default function EditBookPage() {
         category: formData.category ? parseInt(formData.category) : undefined
       };
 
-      const updatedBook = await updateBook(slug as string, bookData);
+      const updatedBook = await booksService.updateBook(slug as string, bookData);
       showNotification('success', 'Livro atualizado com sucesso!');
       router.push(`/livros/${updatedBook.slug}`);
     } catch (error: any) {

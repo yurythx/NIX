@@ -14,6 +14,11 @@ interface AuthContextType {
   register: (data: UserCreateData) => Promise<void>;
   refreshUser: () => Promise<void>;
   lastRefresh: Date | null;
+  showLogoutModal: boolean;
+  setShowLogoutModal: (show: boolean) => void;
+  showLoginSuccessModal: boolean;
+  setShowLoginSuccessModal: (show: boolean) => void;
+  handleLogout: () => void;
 }
 
 // Criação do contexto
@@ -34,6 +39,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showLoginSuccessModal, setShowLoginSuccessModal] = useState(false);
 
   // Referência para o intervalo de atualização
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,7 +61,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const currentUser = await authService.getCurrentUser();
           setUser(currentUser);
           // Armazenar no localStorage
-          localStorage.setItem('prometheus_user', JSON.stringify(currentUser));
+          localStorage.setItem('nix_user', JSON.stringify(currentUser));
           setLastRefresh(new Date());
         } else {
           // Usar usuário do armazenamento local
@@ -97,6 +104,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const response = await authService.login(data);
       setUser(response.user);
       setIsAuthenticated(true);
+      // Mostrar modal de sucesso após o login
+      setShowLoginSuccessModal(true);
     } catch (error) {
       console.error('Erro ao fazer login:', error);
       throw error;
@@ -105,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Função de logout
+  // Função de logout (sem modal)
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -133,6 +142,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       document.documentElement.classList.remove('theme-blue', 'theme-purple', 'theme-green', 'theme-red', 'theme-orange');
       document.documentElement.classList.add(`theme-${savedColor}`);
     }
+  };
+
+  // Função para mostrar o modal de confirmação de logout
+  const handleLogout = () => {
+    setShowLogoutModal(true);
   };
 
   // Função de registro
@@ -173,7 +187,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const currentUser = await authService.getCurrentUser();
       setUser(currentUser);
       // Atualizar no localStorage
-      localStorage.setItem('prometheus_user', JSON.stringify(currentUser));
+      localStorage.setItem('nix_user', JSON.stringify(currentUser));
       setLastRefresh(new Date());
     } catch (error) {
       console.error('Erro ao atualizar usuário:', error);
@@ -192,6 +206,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     refreshUser,
     lastRefresh,
+    showLogoutModal,
+    setShowLogoutModal,
+    showLoginSuccessModal,
+    setShowLoginSuccessModal,
+    handleLogout,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

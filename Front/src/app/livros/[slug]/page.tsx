@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Book, Calendar, Edit, Headphones, ArrowLeft, Bookmark, Eye, MessageSquare } from 'lucide-react';
+import { Book, Calendar, Edit, Headphones, ArrowLeft, Eye } from 'lucide-react';
 import Link from 'next/link';
 import booksService, { Book as BookType } from '../../../services/api/books.service';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -11,10 +11,6 @@ import DeleteBookButton from '../components/DeleteBookButton';
 import { motion } from 'framer-motion';
 import PageTransition from '../../../components/ui/PageTransition';
 import BookDetailSkeleton from '../../../components/ui/skeletons/BookDetailSkeleton';
-import UnifiedCommentList from '../../../components/comments/UnifiedCommentList';
-import { ContentType } from '../../../services/api/unified-comments.service';
-import FavoriteButton from '../../../components/ui/FavoriteButton';
-import StarRating from '../../../components/ui/StarRating';
 import LazyImage from '../../../components/ui/LazyImage';
 import AudioPlayer from '../../../components/ui/AudioPlayer';
 import PdfViewer from '../../../components/ui/PdfViewer';
@@ -30,8 +26,6 @@ export default function BookDetailPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [bookmarks, setBookmarks] = useState<number[]>([]);
-  const [audioBookmarks, setAudioBookmarks] = useState<number[]>([]);
 
   const [viewCount, setViewCount] = useState(0);
 
@@ -66,16 +60,7 @@ export default function BookDetailPage() {
         console.error('Erro ao incrementar visualizações:', viewErr);
       }
 
-      // Carregar marcadores salvos do localStorage
-      const savedBookmarks = localStorage.getItem(`book_${bookData.id}_bookmarks`);
-      if (savedBookmarks) {
-        setBookmarks(JSON.parse(savedBookmarks));
-      }
 
-      const savedAudioBookmarks = localStorage.getItem(`book_${bookData.id}_audio_bookmarks`);
-      if (savedAudioBookmarks) {
-        setAudioBookmarks(JSON.parse(savedAudioBookmarks));
-      }
     } catch (err: any) {
       console.error('Erro ao buscar livro:', err);
       setError('Não foi possível carregar o livro. Por favor, tente novamente mais tarde.');
@@ -117,31 +102,7 @@ export default function BookDetailPage() {
     setIsPlaying(!isPlaying);
   };
 
-  // Adicionar marcador de página
-  const addPageBookmark = (page: number) => {
-    if (!book) return;
 
-    const newBookmarks = [...bookmarks];
-    if (!newBookmarks.includes(page)) {
-      newBookmarks.push(page);
-      setBookmarks(newBookmarks);
-      localStorage.setItem(`book_${book.id}_bookmarks`, JSON.stringify(newBookmarks));
-      showNotification('success', `Marcador adicionado na página ${page}`);
-    }
-  };
-
-  // Adicionar marcador de áudio
-  const addAudioBookmark = (time: number) => {
-    if (!book) return;
-
-    const newBookmarks = [...audioBookmarks];
-    if (!newBookmarks.some(bookmark => Math.abs(bookmark - time) < 1)) {
-      newBookmarks.push(time);
-      setAudioBookmarks(newBookmarks);
-      localStorage.setItem(`book_${book.id}_audio_bookmarks`, JSON.stringify(newBookmarks));
-      showNotification('success', 'Marcador de áudio adicionado');
-    }
-  };
 
   // Atualizar página atual
   const handlePageChange = (page: number) => {
@@ -232,11 +193,6 @@ export default function BookDetailPage() {
                     {viewCount} visualizações
                   </span>
 
-                  <span className="inline-flex items-center text-sm">
-                    <MessageSquare className="w-4 h-4 mr-1" />
-                    {book.comments_count || 0}
-                  </span>
-
                   {book.has_audio && (
                     <span className="inline-flex items-center text-sm bg-blue-600 px-2 py-1 rounded-full">
                       <Headphones className="w-4 h-4 mr-1" />
@@ -244,27 +200,17 @@ export default function BookDetailPage() {
                     </span>
                   )}
                 </div>
-
-                <FavoriteButton
-                  contentType="books.book"
-                  objectId={book.id}
-                  showText={true}
-                  size="md"
-                  className="bg-white/20 backdrop-blur-sm hover:bg-white/30"
-                />
               </div>
             </div>
           </div>
         </div>
 
         <div className="p-6">
-          {isAuthenticated && user && (
-            (user.is_superuser || (book.author_id && String(user.id) === String(book.author_id)))
-          ) && (
+          {isAuthenticated && (
             <div className="flex gap-2 mb-6">
               <Link
                 href={`/livros/${slug}/editar`}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
               >
                 <Edit className="w-4 h-4" />
                 Editar
@@ -281,14 +227,6 @@ export default function BookDetailPage() {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">PDF do Livro</h2>
-              <button
-                onClick={() => addPageBookmark(currentPage)}
-                className="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
-                title="Adicionar marcador na página atual"
-              >
-                <Bookmark className="w-4 h-4" />
-                <span className="text-sm">Marcar página</span>
-              </button>
             </div>
 
             {book.pdf_file ? (
@@ -299,24 +237,6 @@ export default function BookDetailPage() {
                   onPageChange={handlePageChange}
                   className="min-h-[500px]"
                 />
-
-                {/* Lista de marcadores de página */}
-                {bookmarks.length > 0 && (
-                  <div className="mt-4 p-4 bg-white dark:bg-gray-700 rounded-lg">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Páginas marcadas</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {bookmarks.map((page, index) => (
-                        <button
-                          key={index}
-                          onClick={() => handlePageChange(page)}
-                          className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 rounded"
-                        >
-                          Página {page}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             ) : (
               <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-300 p-4 rounded-lg">
@@ -335,22 +255,11 @@ export default function BookDetailPage() {
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}
                 onEnded={() => setIsPlaying(false)}
-                onBookmark={addAudioBookmark}
-                bookmarks={audioBookmarks}
               />
             </div>
           )}
 
-          {/* Avaliação */}
-          <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Avaliação</h2>
-            <StarRating
-              contentType="books.book"
-              objectId={book.id}
-              showSummary={true}
-              size="md"
-            />
-          </div>
+
 
           <div className="prose dark:prose-invert max-w-none">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Descrição</h2>
@@ -360,13 +269,6 @@ export default function BookDetailPage() {
           </div>
         </div>
       </div>
-
-      {/* Comentários */}
-      <UnifiedCommentList
-        contentType={ContentType.BOOK}
-        contentId={slug as string}
-        title="Comentários do Livro"
-      />
       </div>
     </PageTransition>
   );

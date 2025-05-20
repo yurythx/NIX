@@ -5,9 +5,9 @@ import { API_BASE_URL, API_ENDPOINTS, getDefaultHeaders, handleApiError } from '
 import { AuthTokens, LoginData, LoginResponse, User, UserCreateData } from '../../types/models';
 
 // Chaves para armazenamento local
-const ACCESS_TOKEN_KEY = 'viixen_access_token';
-const REFRESH_TOKEN_KEY = 'viixen_refresh_token';
-const USER_KEY = 'viixen_user';
+const ACCESS_TOKEN_KEY = 'nix_access_token';
+const REFRESH_TOKEN_KEY = 'nix_refresh_token';
+const USER_KEY = 'nix_user';
 
 /**
  * Realiza login do usuário

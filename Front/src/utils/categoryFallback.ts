@@ -70,9 +70,9 @@ export const getCategories = async (): Promise<Category[]> => {
 
     // Tentar buscar da API usando a URL correta
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    console.log(`Buscando categorias de: ${API_BASE_URL}/api/v1/categories/`);
+    console.log(`Buscando categorias de: ${API_BASE_URL}/api/categories-simple/`);
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/categories/`, {
+    const response = await fetch(`${API_BASE_URL}/api/categories-simple/`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',

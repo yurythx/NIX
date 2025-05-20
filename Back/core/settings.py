@@ -51,6 +51,8 @@ INSTALLED_APPS = [
     'django_filters',
     'djoser',
     'drf_yasg',
+    # .drf_spectacular.,
+    # .drf_spectacular_sidecar.,
 
     'axes',
 
@@ -60,8 +62,6 @@ INSTALLED_APPS = [
     'apps.categories',
     'apps.mangas',
     'apps.books',
-    'apps.ratings',
-    'apps.comments',
 
 ]
 
@@ -249,7 +249,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+
     'DEFAULT_VERSIONING_CLASS': 'rest_framework.versioning.URLPathVersioning',
     # Usando o manipulador de exceções padrão do DRF
     'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
@@ -385,6 +385,68 @@ AUDIO_FORMATS = {
     "flac": "audio/flac",
     "wav": "audio/wav",
     "aac": "audio/aac",
+}
+
+# Configurações do reCAPTCHA
+RECAPTCHA_SITE_KEY = os.getenv('RECAPTCHA_SITE_KEY', '')
+RECAPTCHA_SECRET_KEY = os.getenv('RECAPTCHA_SECRET_KEY', '')
+RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify'
+RECAPTCHA_REQUIRED = False  # Definir como True para exigir captcha em produção
+
+# Configurações do DRF Spectacular
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'NIX API',
+    'DESCRIPTION': """
+    API do projeto NIX para gerenciamento de conteúdo digital.
+
+    ## Recursos Disponíveis
+
+    * **Usuários**: Gerenciamento de contas de usuário
+    * **Artigos**: Publicação e gerenciamento de artigos
+    * **Mangás**: Leitura e gerenciamento de mangás
+    * **Livros**: Leitura e gerenciamento de livros
+    * **Categorias**: Organização de conteúdo por categorias
+
+    ## Autenticação
+
+    A API utiliza autenticação JWT (JSON Web Token). Para acessar endpoints protegidos,
+    é necessário obter um token através do endpoint `/api/v1/auth/jwt/create/` e incluí-lo
+    no cabeçalho das requisições como `Authorization: Bearer {token}`.
+    """,
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    'COMPONENT_SPLIT_REQUEST': True,
+    'COMPONENT_NO_READ_ONLY_REQUIRED': False,
+    'SCHEMA_PATH_PREFIX': r'/api/v[0-9]',
+    'SERVERS': [
+        {'url': 'http://localhost:8000', 'description': 'Desenvolvimento local'},
+        {'url': 'https://api.nix.com', 'description': 'Produção'},
+    ],
+    'TAGS': [
+        {'name': 'auth', 'description': 'Operações de autenticação'},
+        {'name': 'users', 'description': 'Operações de usuários'},
+        {'name': 'articles', 'description': 'Operações de artigos'},
+        {'name': 'books', 'description': 'Operações de livros'},
+        {'name': 'mangas', 'description': 'Operações de mangás'},
+        {'name': 'categories', 'description': 'Operações de categorias'},
+    ],
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+        'defaultModelsExpandDepth': 3,
+        'defaultModelExpandDepth': 3,
+        'defaultModelRendering': 'model',
+        'displayRequestDuration': True,
+        'docExpansion': 'list',
+        'filter': True,
+        'showExtensions': True,
+        'showCommonExtensions': True,
+        'tryItOutEnabled': True,
+    },
 }
 
 # Logging

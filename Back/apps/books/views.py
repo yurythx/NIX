@@ -43,7 +43,7 @@ class BookViewSet(viewsets.ModelViewSet):
     """
     ViewSet para o modelo Book
     """
-    queryset = Book.objects.all().order_by('-created_at').select_related('category')
+    queryset = Book.objects.all().order_by('-created_at')
     serializer_class = BookSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]

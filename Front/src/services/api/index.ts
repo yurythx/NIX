@@ -13,6 +13,7 @@ export * as mangasService from './mangas.service';
 export * as booksService from './books.service';
 export * as commentModerationService from './comment-moderation.service';
 export * as settingsService from './settings.service';
+export * as statisticsService from './statistics.service';
 
 // Exportações individuais para compatibilidade
 import * as articlesServiceModule from './articles.service';

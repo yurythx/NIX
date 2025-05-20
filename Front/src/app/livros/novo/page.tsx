@@ -6,7 +6,6 @@ import { ArrowLeft, Book, Upload, Headphones } from 'lucide-react';
 import Link from 'next/link';
 import booksService from '../../../services/api/books.service';
 import chunkedUploadService from '../../../services/api/books.chunked-upload.service';
-import { getCategories } from '../../../utils/categoryFallback';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import PageTransition from '../../../components/ui/PageTransition';
@@ -16,11 +15,10 @@ export default function NewBookPage() {
   const { showNotification } = useNotification();
   const { isAuthenticated, user, isLoading } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: '',
     has_audio: false
   });
   const [coverFile, setCoverFile] = useState<File | null>(null);
@@ -51,27 +49,7 @@ export default function NewBookPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, isAuthenticated, user]);
 
-  // Buscar categorias
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const categoriesData = await getCategories();
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error('Erro ao buscar categorias:', error);
-        // Usar uma referência estável para showNotification
-        if (error instanceof Error) {
-          showNotification('error', `Erro ao carregar categorias: ${error.message}`);
-        } else {
-          showNotification('error', 'Erro ao carregar categorias');
-        }
-      }
-    };
 
-    fetchCategories();
-    // Remover showNotification das dependências para evitar loop infinito
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Manipular mudanças nos campos do formulário
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -303,8 +281,7 @@ export default function NewBookPage() {
         has_audio: formData.has_audio,
         cover: coverFile,
         pdf_file_path: pdfFilePath,
-        audio_file_path: formData.has_audio ? audioFilePath : undefined,
-        category: formData.category ? parseInt(formData.category) : undefined
+        audio_file_path: formData.has_audio ? audioFilePath : undefined
       };
 
       const newBook = await booksService.createBook(bookData);
@@ -377,26 +354,7 @@ export default function NewBookPage() {
             )}
           </div>
 
-          {/* Categoria */}
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Categoria
-            </label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            >
-              <option value="">Selecione uma categoria</option>
-              {categories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
+
 
           {/* Capa */}
           <div>

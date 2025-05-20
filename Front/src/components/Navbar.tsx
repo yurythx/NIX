@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import ThemeSettings from './ThemeSettings';
 import ThemeToggle from './ThemeToggle';
 import { motion, AnimatePresence } from 'framer-motion';
+import BackendStatusIndicator from './common/BackendStatusIndicator';
 
 interface NavbarProps {
   isAuthenticated: boolean;
@@ -20,7 +21,7 @@ export default function Navbar({ isAuthenticated, onToggleAuth }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white dark:bg-gray-800 shadow-md flex justify-between items-center transition-all duration-300 border-b border-gray-200 dark:border-gray-700">
+    <header className="bg-white dark:bg-gray-800 shadow-md flex justify-between items-center transition-colors duration-300 border-b border-gray-200 dark:border-gray-700">
       <div className="flex items-center gap-4 p-4">
         {isAuthenticated && (
           <motion.button
@@ -34,7 +35,7 @@ export default function Navbar({ isAuthenticated, onToggleAuth }: NavbarProps) {
           </motion.button>
         )}
         <Link href="/" className="text-2xl font-semibold text-purple-600 dark:text-indigo-300 hover:opacity-80 transition-opacity">
-          Projeto Prometheus
+          NIX
         </Link>
       </div>
 
@@ -99,6 +100,9 @@ export default function Navbar({ isAuthenticated, onToggleAuth }: NavbarProps) {
       </div>
 
       <div className="flex items-center gap-4 p-4">
+        <div className="mr-1" title="Status do sistema">
+          <BackendStatusIndicator />
+        </div>
         <ThemeSettings />
         <ThemeToggle className="text-gray-600 dark:text-gray-200 hover:text-purple-600 dark:hover:text-indigo-400 hover:bg-purple-50 dark:hover:bg-gray-700" />
 

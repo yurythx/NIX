@@ -5,7 +5,7 @@ Implementa o padrão de repositório para encapsular a lógica de acesso a dados
 
 from typing import List, Optional
 from django.db.models import QuerySet, F, Count
-from apps.articles.models import Article, Comment
+from apps.articles.models import Article
 from core.repositories.base_repository import BaseRepository
 
 class ArticleRepository(BaseRepository):
@@ -91,53 +91,5 @@ class ArticleRepository(BaseRepository):
         ).distinct()
 
 
-class CommentRepository(BaseRepository):
-    """
-    Repositório para comentários
-    """
-    def __init__(self):
-        """
-        Inicializa o repositório com o modelo Comment
-        """
-        super().__init__(Comment)
-
-    def get_by_article(self, article_id: int) -> QuerySet:
-        """
-        Obtém comentários de um artigo
-        """
-        return self.model_class.objects.filter(article_id=article_id, parent=None)
-
-    def get_replies(self, comment_id: int) -> QuerySet:
-        """
-        Obtém respostas de um comentário
-        """
-        return self.model_class.objects.filter(parent_id=comment_id)
-
-    def approve(self, comment_id: int) -> bool:
-        """
-        Aprova um comentário
-        """
-        comment = self.get_by_id(comment_id)
-        if not comment:
-            return False
-
-        comment.is_approved = True
-        comment.save()
-        return True
-
-    def reject(self, comment_id: int) -> bool:
-        """
-        Rejeita um comentário
-        """
-        comment = self.get_by_id(comment_id)
-        if not comment:
-            return False
-
-        comment.is_approved = False
-        comment.save()
-        return True
-
-
-# Instâncias únicas dos repositórios (Singleton)
+# Instância única do repositório (Singleton)
 article_repository = ArticleRepository()
-comment_repository = CommentRepository()

@@ -195,7 +195,7 @@ export default function FloatingMenu({
         >
           <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
             <h1 className="text-xl font-bold text-gray-800 dark:text-white">
-              Projeto Prometheus
+              NIX
             </h1>
             <button
               onClick={toggleSidebar}

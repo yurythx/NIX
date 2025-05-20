@@ -22,10 +22,8 @@ const ArticleCard: React.FC<ArticleCardProps> = ({ article, onDelete }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // Verificar se o usuário é o autor do artigo ou um administrador
-  const canEdit = isAuthenticated && user && (
-    user.is_staff || user.is_superuser || (article.author_id && user.id === article.author_id)
-  );
+  // Qualquer usuário autenticado pode editar e excluir artigos
+  const canEdit = isAuthenticated;
 
   // Função para formatar a data
   const formatDate = (dateString: string) => {

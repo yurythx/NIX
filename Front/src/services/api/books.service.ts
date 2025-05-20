@@ -692,12 +692,21 @@ export const incrementViews = async (bookId: number, slug: string): Promise<{ vi
     console.log(`Visualizações do livro ${slug} incrementadas localmente: ${viewsCount}`);
 
     // Tentar usar o endpoint real em segundo plano (não aguardar resposta)
-    fetch(`${API_BASE_URL}${API_ENDPOINTS.BOOKS.INCREMENT_VIEWS(slug)}`, {
-      method: 'POST',
-      headers: getDefaultHeaders(),
-    }).catch(() => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/books-simple/${slug}/increment_views/`, {
+        method: 'POST',
+        headers: getDefaultHeaders(),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`Visualizações do livro ${slug} incrementadas no servidor:`, data);
+        return data;
+      }
+    } catch (apiError) {
       // Ignorar erros silenciosamente
-    });
+      console.log(`Erro ao incrementar visualizações no servidor para ${slug}:`, apiError);
+    }
 
     return { views_count: viewsCount };
   } catch (error) {

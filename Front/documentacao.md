@@ -1,4 +1,4 @@
-# Documentação do Projeto Viixen
+# Documentação do Projeto NIX
 
 ## 1. Estrutura de Arquivos
 ```
@@ -318,4 +318,4 @@ Para suporte ou dúvidas:
 
 ---
 
-Esta documentação será atualizada conforme o projeto evolui. Mantenha-a sempre atualizada para facilitar o desenvolvimento e manutenção. 
+Esta documentação será atualizada conforme o projeto evolui. Mantenha-a sempre atualizada para facilitar o desenvolvimento e manutenção.

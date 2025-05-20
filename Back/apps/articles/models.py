@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
 from django.utils.crypto import get_random_string
-from django.utils import timezone
 from django.conf import settings
 from apps.categories.models import Category
 
@@ -65,43 +64,35 @@ class Article(models.Model):
         self.save(update_fields=['views_count'])
         return self.views_count
 
+
 class Comment(models.Model):
-    """
-    Modelo para comentários em artigos.
-    Permite comentários anônimos (sem usuário autenticado).
-    """
-    article = models.ForeignKey(Article, related_name='comments', on_delete=models.CASCADE)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100, verbose_name='Nome')
-    email = models.EmailField(null=True, blank=True, verbose_name='Email')
-    text = models.TextField(verbose_name='Texto')
-    created_at = models.DateTimeField(default=timezone.now, verbose_name='Criado em')
-    updated_at = models.DateTimeField(auto_now=True, verbose_name='Atualizado em')
-
-    # Campos para moderação
-    is_approved = models.BooleanField(default=True, verbose_name='Aprovado')
-    is_spam = models.BooleanField(default=False, verbose_name='Marcado como spam')
-
-    # Campos para rastreamento
-    ip_address = models.GenericIPAddressField(null=True, blank=True, verbose_name='Endereço IP')
-    user_agent = models.TextField(null=True, blank=True, verbose_name='User Agent')
+    article = models.ForeignKey(Article, related_name='comments', on_delete=models.CASCADE, null=True, blank=True)
+    article_slug = models.CharField(max_length=255, null=True, blank=True)
+    name = models.CharField(max_length=100, default='Anônimo')
+    email = models.EmailField(blank=True, null=True)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_approved = models.BooleanField(default=True)
+    is_spam = models.BooleanField(default=False)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+    captcha_token = models.CharField(max_length=255, blank=True, null=True, help_text="Token de verificação do captcha")
+    ip_address = models.GenericIPAddressField(blank=True, null=True, help_text="Endereço IP do autor do comentário")
+    user_agent = models.TextField(blank=True, null=True, help_text="User-Agent do navegador do autor")
 
     class Meta:
-        ordering = ['created_at']
-        verbose_name = 'Comentário'
-        verbose_name_plural = 'Comentários'
+        ordering = ['-created_at']
+        verbose_name = 'comentário'
+        verbose_name_plural = 'comentários'
 
     def __str__(self):
-        return f"{self.name} em {self.article.title}"
+        return f"Comentário de {self.name} em {self.article.title if self.article else 'artigo desconhecido'}"
 
-    def save(self, *args, **kwargs):
-        # Validação para garantir que o parent seja do mesmo artigo
-        if self.parent and self.parent.article_id != self.article_id:
-            raise ValueError("O comentário pai deve pertencer ao mesmo artigo")
-
-        super().save(*args, **kwargs)
-
-    @property
-    def get_replies(self):
-        """Retorna todas as respostas a este comentário."""
-        return Comment.objects.filter(parent=self, is_approved=True, is_spam=False)
+    def get_depth(self):
+        """Retorna a profundidade do comentário na hierarquia"""
+        depth = 0
+        parent = self.parent
+        while parent:
+            depth += 1
+            parent = parent.parent
+        return depth

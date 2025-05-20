@@ -17,32 +17,74 @@ const MOCK_CATEGORIES: Category[] = [
  */
 export const getCategoriesBase = async (): Promise<Category[]> => {
   try {
-    // Tentar buscar da API primeiro
-    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CATEGORIES.BASE}`, {
-      method: 'GET',
-      headers: getDefaultHeaders(),
-    });
+    // Tentar buscar da API simplificada primeiro
+    try {
+      console.log('Tentando obter categorias do endpoint simplificado...');
+      console.log('URL:', `${API_BASE_URL}${API_ENDPOINTS.CATEGORIES.BASE}`);
 
-    // Se a API retornar erro, usar dados simulados
-    if (!response.ok) {
-      console.log('Usando dados simulados para categorias');
-      return MOCK_CATEGORIES;
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CATEGORIES.BASE}`, {
+        method: 'GET',
+        headers: getDefaultHeaders(),
+      });
+
+      console.log('Status da resposta:', response.status);
+
+      if (!response.ok) {
+        throw new Error(`Erro ao obter categorias: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Dados recebidos do endpoint simplificado:', data);
+
+      // Verificar se os dados retornados são uma resposta paginada
+      if (data && typeof data === 'object' && 'results' in data) {
+        return data.results;
+      }
+
+      // Verificar se os dados retornados são um array
+      if (Array.isArray(data)) {
+        return data;
+      }
+
+      console.error('API retornou um formato inválido para categorias:', data);
+      throw new Error('Formato de dados inválido');
+    } catch (simplifiedError) {
+      console.warn('Erro ao obter categorias do endpoint simplificado, tentando endpoint original:', simplifiedError);
+
+      // Tentar o endpoint original como fallback
+      try {
+        console.log('Tentando obter categorias do endpoint original...');
+        console.log('URL:', `${API_BASE_URL}${API_ENDPOINTS.CATEGORIES.ORIGINAL_BASE}`);
+
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.CATEGORIES.ORIGINAL_BASE}`, {
+          method: 'GET',
+          headers: getDefaultHeaders(),
+        });
+
+        if (!response.ok) {
+          console.log('Usando dados simulados para categorias');
+          return MOCK_CATEGORIES;
+        }
+
+        const data = await response.json();
+
+        // Verificar se os dados retornados são uma resposta paginada
+        if (data && typeof data === 'object' && 'results' in data) {
+          return data.results;
+        }
+
+        // Verificar se os dados retornados são um array
+        if (Array.isArray(data)) {
+          return data;
+        }
+
+        console.error('API retornou um formato inválido para categorias:', data);
+        return MOCK_CATEGORIES;
+      } catch (originalError) {
+        console.error('Erro ao obter categorias do endpoint original:', originalError);
+        return MOCK_CATEGORIES;
+      }
     }
-
-    const data = await response.json();
-
-    // Verificar se os dados retornados são uma resposta paginada
-    if (data && typeof data === 'object' && 'results' in data) {
-      return data.results;
-    }
-
-    // Verificar se os dados retornados são um array
-    if (Array.isArray(data)) {
-      return data;
-    }
-
-    console.error('API retornou um formato inválido para categorias:', data);
-    return MOCK_CATEGORIES;
   } catch (error) {
     console.error('Erro ao buscar categorias:', error);
     return MOCK_CATEGORIES;

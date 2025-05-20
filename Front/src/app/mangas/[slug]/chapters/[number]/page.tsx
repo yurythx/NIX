@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ChevronLeft, ChevronRight, Maximize, Minimize, MessageSquare } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import mangasService from '../../../../../services/api/mangas.service';
@@ -9,8 +9,6 @@ import { useAuth } from '../../../../../contexts/AuthContext';
 import { useNotification } from '../../../../../contexts/NotificationContext';
 import PdfImageViewer from '../../../../../components/PdfImageViewer';
 import PdfFallbackViewer from '../../../../../components/PdfFallbackViewer';
-import UnifiedCommentList from '../../../../../components/comments/UnifiedCommentList';
-import { ContentType } from '../../../../../services/api/unified-comments.service';
 
 interface Page {
   id: number;
@@ -497,16 +495,7 @@ export default function ChapterPage({ params }: { params: { slug: string; number
         </div>
       )}
 
-      {/* Seção de comentários - visível apenas quando não está em tela cheia */}
-      {!isLoading && !error && chapter && !isFullscreen && (
-        <div className="mt-8">
-          <UnifiedCommentList
-            contentType={ContentType.CHAPTER}
-            contentId={chapter.id}
-            title="Comentários do Capítulo"
-          />
-        </div>
-      )}
+
     </div>
   );
 }

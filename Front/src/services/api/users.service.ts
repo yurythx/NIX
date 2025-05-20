@@ -61,16 +61,16 @@ const MOCK_USERS: User[] = [
 
 /**
  * Obtém a lista de usuários
- * NOTA: Temporariamente usando dados simulados até que o backend esteja corrigido
+ * Tenta usar o endpoint simplificado e, se falhar, usa dados simulados
  */
 export const getUsers = async (): Promise<User[]> => {
   const token = getAccessToken();
 
   try {
-    console.log('Tentando obter usuários do backend...');
-    console.log('URL:', `${API_BASE_URL}${API_ENDPOINTS.USERS.BASE}`);
+    console.log('Tentando obter usuários do endpoint simplificado...');
+    console.log('URL:', `${API_BASE_URL}/api/users-simple/`);
 
-    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS.BASE}`, {
+    const response = await fetch(`${API_BASE_URL}/api/users-simple/`, {
       method: 'GET',
       headers: getDefaultHeaders(token || undefined),
     });
@@ -85,14 +85,97 @@ export const getUsers = async (): Promise<User[]> => {
     console.log('Dados recebidos do backend:', data);
     return data;
   } catch (error) {
-    console.warn('Erro ao obter usuários do backend, usando dados simulados:', error);
+    console.warn('Erro ao obter usuários do endpoint simplificado, usando dados simulados:', error);
 
     // Simular um atraso de rede para dar feedback visual
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Retornar dados simulados
-    console.log('Retornando dados simulados:', MOCK_USERS);
-    return [...MOCK_USERS];
+    // Gerar dados simulados mais realistas
+    const simulatedUsers: User[] = [
+      {
+        id: '1',
+        username: 'admin',
+        email: 'admin@nix.com',
+        first_name: 'Administrador',
+        last_name: 'Sistema',
+        is_active: true,
+        is_staff: true,
+        is_superuser: true,
+        slug: 'admin',
+        position: 'Administrador',
+        bio: 'Administrador do sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '2',
+        username: 'editor',
+        email: 'editor@nix.com',
+        first_name: 'Editor',
+        last_name: 'Conteúdo',
+        is_active: true,
+        is_staff: true,
+        is_superuser: false,
+        slug: 'editor',
+        position: 'Editor de Conteúdo',
+        bio: 'Responsável pela edição de conteúdo no sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '3',
+        username: 'usuario',
+        email: 'usuario@nix.com',
+        first_name: 'Usuário',
+        last_name: 'Padrão',
+        is_active: true,
+        is_staff: false,
+        is_superuser: false,
+        slug: 'usuario',
+        position: 'Usuário',
+        bio: 'Usuário padrão do sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '4',
+        username: 'leitor',
+        email: 'leitor@nix.com',
+        first_name: 'Leitor',
+        last_name: 'Assíduo',
+        is_active: true,
+        is_staff: false,
+        is_superuser: false,
+        slug: 'leitor',
+        position: 'Leitor',
+        bio: 'Leitor assíduo do sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      {
+        id: '5',
+        username: 'autor',
+        email: 'autor@nix.com',
+        first_name: 'Autor',
+        last_name: 'Conteúdo',
+        is_active: true,
+        is_staff: false,
+        is_superuser: false,
+        slug: 'autor',
+        position: 'Autor',
+        bio: 'Autor de conteúdo no sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    ];
+
+    console.log('Retornando dados simulados:', simulatedUsers);
+    return simulatedUsers;
   }
 };
 
@@ -164,16 +247,16 @@ const MOCK_USER_DETAILS: Record<string, UserDetail> = {
 
 /**
  * Obtém um usuário pelo slug
- * NOTA: Temporariamente usando dados simulados até que o backend esteja corrigido
+ * Tenta usar o endpoint simplificado e, se falhar, usa dados simulados
  */
 export const getUserBySlug = async (slug: string): Promise<UserDetail> => {
   const token = getAccessToken();
 
   try {
-    console.log(`Tentando obter usuário com slug ${slug}...`);
-    console.log('URL:', `${API_BASE_URL}${API_ENDPOINTS.USERS.DETAIL(slug)}`);
+    console.log(`Tentando obter usuário com slug ${slug} do endpoint simplificado...`);
+    console.log('URL:', `${API_BASE_URL}/api/users-simple/${slug}/`);
 
-    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS.DETAIL(slug)}`, {
+    const response = await fetch(`${API_BASE_URL}/api/users-simple/${slug}/`, {
       method: 'GET',
       headers: getDefaultHeaders(token || undefined),
     });
@@ -188,16 +271,111 @@ export const getUserBySlug = async (slug: string): Promise<UserDetail> => {
     console.log('Dados do usuário recebidos do backend:', data);
     return data;
   } catch (error) {
-    console.warn(`Erro ao obter usuário com slug ${slug}, usando dados simulados:`, error);
+    console.warn(`Erro ao obter usuário com slug ${slug} do endpoint simplificado, usando dados simulados:`, error);
 
     // Simular um atraso de rede para dar feedback visual
     await new Promise(resolve => setTimeout(resolve, 500));
 
+    // Gerar dados simulados para o usuário solicitado
+    const simulatedUsers = {
+      'admin': {
+        id: '1',
+        username: 'admin',
+        email: 'admin@nix.com',
+        first_name: 'Administrador',
+        last_name: 'Sistema',
+        full_name: 'Administrador Sistema',
+        is_active: true,
+        is_staff: true,
+        is_superuser: true,
+        last_login: new Date().toISOString(),
+        slug: 'admin',
+        position: 'Administrador',
+        bio: 'Administrador do sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      'editor': {
+        id: '2',
+        username: 'editor',
+        email: 'editor@nix.com',
+        first_name: 'Editor',
+        last_name: 'Conteúdo',
+        full_name: 'Editor Conteúdo',
+        is_active: true,
+        is_staff: true,
+        is_superuser: false,
+        last_login: new Date().toISOString(),
+        slug: 'editor',
+        position: 'Editor de Conteúdo',
+        bio: 'Responsável pela edição de conteúdo no sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      'usuario': {
+        id: '3',
+        username: 'usuario',
+        email: 'usuario@nix.com',
+        first_name: 'Usuário',
+        last_name: 'Padrão',
+        full_name: 'Usuário Padrão',
+        is_active: true,
+        is_staff: false,
+        is_superuser: false,
+        last_login: new Date().toISOString(),
+        slug: 'usuario',
+        position: 'Usuário',
+        bio: 'Usuário padrão do sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      'leitor': {
+        id: '4',
+        username: 'leitor',
+        email: 'leitor@nix.com',
+        first_name: 'Leitor',
+        last_name: 'Assíduo',
+        full_name: 'Leitor Assíduo',
+        is_active: true,
+        is_staff: false,
+        is_superuser: false,
+        last_login: new Date().toISOString(),
+        slug: 'leitor',
+        position: 'Leitor',
+        bio: 'Leitor assíduo do sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      },
+      'autor': {
+        id: '5',
+        username: 'autor',
+        email: 'autor@nix.com',
+        first_name: 'Autor',
+        last_name: 'Conteúdo',
+        full_name: 'Autor Conteúdo',
+        is_active: true,
+        is_staff: false,
+        is_superuser: false,
+        last_login: new Date().toISOString(),
+        slug: 'autor',
+        position: 'Autor',
+        bio: 'Autor de conteúdo no sistema NIX',
+        avatar: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+    };
+
     // Verificar se temos dados simulados para este slug
-    if (MOCK_USER_DETAILS[slug]) {
-      console.log(`Retornando dados simulados para o usuário ${slug}:`, MOCK_USER_DETAILS[slug]);
-      return MOCK_USER_DETAILS[slug];
+    if (simulatedUsers[slug as keyof typeof simulatedUsers]) {
+      console.log(`Retornando dados simulados para o usuário ${slug}:`, simulatedUsers[slug as keyof typeof simulatedUsers]);
+      return simulatedUsers[slug as keyof typeof simulatedUsers];
     }
+  }
 
     // Se não temos dados para este slug, criar um usuário genérico
     const mockUser = {
@@ -224,52 +402,150 @@ export const getUserBySlug = async (slug: string): Promise<UserDetail> => {
     console.log(`Retornando usuário genérico simulado para ${slug}:`, mockUser);
     return mockUser;
   }
-};
 
 /**
- * Atualiza os dados do usuário pelo slug
- * NOTA: Temporariamente usando dados simulados até que o backend esteja corrigido
+ * Cria um novo usuário
+ * Tenta usar o endpoint simplificado e, se falhar, usa dados simulados
  */
-export const updateUser = async (slug: string, data: Partial<User>): Promise<User> => {
+export const createUser = async (data: Partial<User>): Promise<User> => {
   const token = getAccessToken();
 
-  if (!token) {
-    throw new Error('Usuário não autenticado');
-  }
-
-  console.log('Atualizando usuário com slug:', slug);
-  console.log('Dados para atualização:', data);
-
   try {
-    // Para enviar arquivos, precisamos usar FormData
-    const formData = new FormData();
+    console.log('Tentando criar usuário no endpoint simplificado...');
+    console.log('Dados para criação:', data);
+    console.log('URL:', `${API_BASE_URL}/api/users-simple/create/`);
 
-    // Adicionar campos ao FormData
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        formData.append(key, value);
-        console.log(`Adicionando campo ao FormData: ${key}`);
-      }
-    });
-
-    const url = `${API_BASE_URL}${API_ENDPOINTS.USERS.DETAIL(slug)}`;
-    console.log('URL da requisição:', url);
-
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        // Não definimos Content-Type aqui porque o FormData define automaticamente
-      },
-      body: formData,
+    const response = await fetch(`${API_BASE_URL}/api/users-simple/create/`, {
+      method: 'POST',
+      headers: getDefaultHeaders(token || undefined),
+      body: JSON.stringify(data),
     });
 
     console.log('Status da resposta:', response.status);
 
-    await handleApiError(response);
-    return response.json();
+    if (!response.ok) {
+      throw new Error(`Erro ao criar usuário: ${response.status} ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    console.log('Dados do usuário criado:', responseData);
+    return responseData;
   } catch (error) {
-    console.warn(`Erro ao atualizar usuário com slug ${slug}, usando dados simulados:`, error);
+    console.warn('Erro ao criar usuário no endpoint simplificado, usando dados simulados:', error);
+
+    // Tentar o endpoint original como fallback
+    try {
+      console.log('Tentando endpoint original como fallback...');
+      console.log('URL:', `${API_BASE_URL}${API_ENDPOINTS.USERS.BASE}`);
+
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS.BASE}`, {
+        method: 'POST',
+        headers: getDefaultHeaders(token || undefined),
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Dados do usuário criado pelo endpoint original:', responseData);
+        return responseData;
+      }
+    } catch (fallbackError) {
+      console.warn('Fallback também falhou:', fallbackError);
+    }
+
+    // Simular um atraso de rede para dar feedback visual
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Criar um usuário simulado
+    const newUser: User = {
+      id: Math.random().toString(36).substring(2, 15),
+      username: data.username || 'novo_usuario',
+      email: data.email || 'novo@example.com',
+      first_name: data.first_name || '',
+      last_name: data.last_name || '',
+      is_active: true,
+      is_staff: false,
+      is_superuser: false,
+      slug: data.username || 'novo-usuario',
+      position: data.position || '',
+      bio: data.bio || '',
+      avatar: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    console.log('Retornando usuário simulado:', newUser);
+    return newUser;
+  }
+};
+
+/**
+ * Atualiza os dados do usuário pelo slug
+ * Tenta usar o endpoint simplificado e, se falhar, usa dados simulados
+ */
+export const updateUser = async (slug: string, data: Partial<User>): Promise<User> => {
+  const token = getAccessToken();
+
+  try {
+    console.log('Tentando atualizar usuário no endpoint simplificado...');
+    console.log('Dados para atualização:', data);
+    console.log('URL:', `${API_BASE_URL}/api/users-simple/${slug}/update/`);
+
+    const response = await fetch(`${API_BASE_URL}/api/users-simple/${slug}/update/`, {
+      method: 'PUT',
+      headers: getDefaultHeaders(token || undefined),
+      body: JSON.stringify(data),
+    });
+
+    console.log('Status da resposta:', response.status);
+
+    if (!response.ok) {
+      throw new Error(`Erro ao atualizar usuário: ${response.status} ${response.statusText}`);
+    }
+
+    const responseData = await response.json();
+    console.log('Dados do usuário atualizado:', responseData);
+    return responseData;
+  } catch (error) {
+    console.warn(`Erro ao atualizar usuário com slug ${slug} no endpoint simplificado, usando dados simulados:`, error);
+
+    // Tentar o endpoint original como fallback
+    try {
+      if (token) {
+        console.log('Tentando endpoint original como fallback...');
+
+        // Para enviar arquivos, precisamos usar FormData
+        const formData = new FormData();
+
+        // Adicionar campos ao FormData
+        Object.entries(data).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            formData.append(key, value);
+            console.log(`Adicionando campo ao FormData: ${key}`);
+          }
+        });
+
+        const url = `${API_BASE_URL}${API_ENDPOINTS.USERS.DETAIL(slug)}`;
+        console.log('URL da requisição:', url);
+
+        const response = await fetch(url, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            // Não definimos Content-Type aqui porque o FormData define automaticamente
+          },
+          body: formData,
+        });
+
+        if (response.ok) {
+          const responseData = await response.json();
+          console.log('Dados do usuário atualizado pelo endpoint original:', responseData);
+          return responseData;
+        }
+      }
+    } catch (fallbackError) {
+      console.warn('Fallback também falhou:', fallbackError);
+    }
 
     // Simular um atraso de rede para dar feedback visual
     await new Promise(resolve => setTimeout(resolve, 800));
@@ -517,34 +793,56 @@ export const changePassword = async (data: PasswordChangeData): Promise<void> =>
 
 /**
  * Exclui um usuário pelo slug
- * NOTA: Temporariamente usando dados simulados até que o backend esteja corrigido
+ * Tenta usar o endpoint simplificado e, se falhar, usa dados simulados
  */
 export const deleteUser = async (slug: string): Promise<void> => {
   const token = getAccessToken();
 
-  if (!token) {
-    throw new Error('Usuário não autenticado');
-  }
-
-  console.log('Excluindo usuário com slug:', slug);
-
   try {
-    const url = `${API_BASE_URL}${API_ENDPOINTS.USERS.DETAIL(slug)}`;
-    console.log('URL da requisição:', url);
+    console.log('Tentando excluir usuário no endpoint simplificado...');
+    console.log('URL:', `${API_BASE_URL}/api/users-simple/${slug}/delete/`);
 
-    const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}/api/users-simple/${slug}/delete/`, {
       method: 'DELETE',
-      headers: getDefaultHeaders(token),
+      headers: getDefaultHeaders(token || undefined),
     });
 
     console.log('Status da resposta:', response.status);
 
-    // Se a resposta for 204 (No Content), não há corpo para processar
-    if (response.status !== 204) {
-      await handleApiError(response);
+    if (!response.ok && response.status !== 204) {
+      throw new Error(`Erro ao excluir usuário: ${response.status} ${response.statusText}`);
     }
+
+    console.log('Usuário excluído com sucesso no endpoint simplificado');
+    return;
   } catch (error) {
-    console.warn(`Erro ao excluir usuário com slug ${slug}, usando dados simulados:`, error);
+    console.warn(`Erro ao excluir usuário com slug ${slug} no endpoint simplificado, tentando fallback:`, error);
+
+    // Tentar o endpoint original como fallback
+    try {
+      if (token) {
+        console.log('Tentando endpoint original como fallback...');
+        const url = `${API_BASE_URL}${API_ENDPOINTS.USERS.DETAIL(slug)}`;
+        console.log('URL da requisição:', url);
+
+        const response = await fetch(url, {
+          method: 'DELETE',
+          headers: getDefaultHeaders(token),
+        });
+
+        console.log('Status da resposta:', response.status);
+
+        // Se a resposta for 204 (No Content), não há corpo para processar
+        if (response.ok || response.status === 204) {
+          console.log('Usuário excluído com sucesso no endpoint original');
+          return;
+        }
+      }
+    } catch (fallbackError) {
+      console.warn('Fallback também falhou:', fallbackError);
+    }
+
+    console.warn(`Simulando exclusão do usuário com slug ${slug}`);
 
     // Simular um atraso de rede para dar feedback visual
     await new Promise(resolve => setTimeout(resolve, 800));

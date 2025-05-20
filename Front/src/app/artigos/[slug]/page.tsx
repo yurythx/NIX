@@ -126,6 +126,31 @@ export default function ArticlePage({ params }: ArticlePageProps) {
 
   useEffect(() => {
     fetchArticle();
+
+    // Verificar se o artigo foi atualizado recentemente
+    const wasUpdated = sessionStorage.getItem(`article_${params.slug}_updated`);
+    const lastUpdatedArticle = sessionStorage.getItem('last_updated_article');
+
+    if (wasUpdated === 'true' || lastUpdatedArticle === params.slug) {
+      console.log('Artigo foi atualizado recentemente, recarregando dados...');
+
+      // Limpar as flags de atualização
+      sessionStorage.removeItem(`article_${params.slug}_updated`);
+      sessionStorage.removeItem('last_updated_article');
+
+      // Recarregar o artigo do localStorage
+      try {
+        const updatedArticleStr = localStorage.getItem(`article_${params.slug}`);
+        if (updatedArticleStr) {
+          const updatedArticle = JSON.parse(updatedArticleStr);
+          console.log('Carregando artigo atualizado do localStorage:', updatedArticle);
+          setArticle(updatedArticle);
+          setViewCount(updatedArticle.views_count || 0);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar artigo atualizado do localStorage:', error);
+      }
+    }
   }, [params.slug]);
 
   useEffect(() => {
@@ -223,15 +248,13 @@ export default function ArticlePage({ params }: ArticlePageProps) {
           Voltar para a lista de artigos
         </Link>
 
-        {/* Botões de edição e exclusão para autor ou superusuário */}
-        {isAuthenticated && user && (
-          (user.is_superuser || (article.author_id && String(user.id) === String(article.author_id)))
-        ) && (
+        {/* Botões de edição e exclusão para usuários autenticados */}
+        {isAuthenticated && (
           <div className="flex space-x-2">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 href={`/artigos/${article.slug}/editar`}
-                className="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
               >
                 <Edit className="w-4 h-4 mr-1 md:mr-2" />
                 <span className="hidden md:inline">Editar</span>
@@ -242,7 +265,7 @@ export default function ArticlePage({ params }: ArticlePageProps) {
               <DeleteArticleButton
                 slug={article.slug}
                 buttonText={window.innerWidth < 768 ? "Del" : "Excluir"}
-                className="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                className="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               />
             </motion.div>
           </div>

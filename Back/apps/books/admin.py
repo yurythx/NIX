@@ -4,7 +4,6 @@ Configuração do admin para o app de livros
 
 from django.contrib import admin
 from .models import Book
-from .comments import BookComment
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
@@ -36,26 +35,3 @@ class BookAdmin(admin.ModelAdmin):
 
     has_audio.boolean = True
     has_audio.short_description = 'Possui áudio'
-
-
-@admin.register(BookComment)
-class BookCommentAdmin(admin.ModelAdmin):
-    """
-    Configuração do admin para o modelo BookComment
-    """
-    list_display = ('id', 'book', 'user', 'content', 'created_at', 'is_approved', 'is_spam')
-    list_filter = ('created_at', 'is_approved', 'is_spam')
-    search_fields = ('content', 'user__username', 'book__title')
-    readonly_fields = ('created_at', 'updated_at')
-    fieldsets = (
-        ('Informações Básicas', {
-            'fields': ('book', 'user', 'parent', 'content')
-        }),
-        ('Status', {
-            'fields': ('is_approved', 'is_spam')
-        }),
-        ('Datas', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
-    )

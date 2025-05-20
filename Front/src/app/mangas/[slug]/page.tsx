@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, Star, Clock, Calendar, User, Tag, ChevronDown, ChevronUp, Heart, Edit, Plus, MessageSquare, Eye } from 'lucide-react';
+import { ArrowLeft, BookOpen, Star, Clock, Calendar, User, Tag, ChevronDown, ChevronUp, Heart, Edit, Plus, Eye } from 'lucide-react';
 import Link from 'next/link';
 import mangasService from '../../../services/api/mangas.service';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNotification } from '../../../contexts/NotificationContext';
-import UnifiedCommentList from '../../../components/comments/UnifiedCommentList';
-import { ContentType } from '../../../services/api/unified-comments.service';
 import DeleteMangaButton from '../components/DeleteMangaButton';
 import { useRouter } from 'next/navigation';
 
@@ -201,19 +199,17 @@ export default function MangaDetailPage({ params }: { params: { slug: string } }
                 <div className="flex justify-between items-start">
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{manga.title}</h1>
                   <div className="flex gap-2">
-                    {isAuthenticated && user && (
-                      (user.is_superuser || (manga.author_id && String(user.id) === String(manga.author_id)))
-                    ) && (
+                    {isAuthenticated && (
                       <>
                         <Link
                           href={`/mangas/${params.slug}/editar`}
-                          className="p-2 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300"
+                          className="p-2 rounded-full bg-yellow-100 dark:bg-yellow-900 text-yellow-600 dark:text-yellow-300"
                         >
                           <Edit className="w-5 h-5" />
                         </Link>
                         <DeleteMangaButton
                           slug={params.slug}
-                          className="p-2 rounded-full bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300"
+                          className="p-2 rounded-full bg-red-100 dark:bg-red-900 text-red-500 dark:text-red-300"
                           showIcon={true}
                           buttonText=""
                           onDelete={() => router.push('/mangas')}
@@ -303,10 +299,6 @@ export default function MangaDetailPage({ params }: { params: { slug: string } }
                     <Eye className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <span>Visualizações: <span className="font-medium">{viewCount}</span></span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                    <MessageSquare className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-                    <span>Comentários: <span className="font-medium">{manga.comments_count || 0}</span></span>
-                  </div>
                 </div>
 
                 <div className="mt-6">
@@ -342,12 +334,10 @@ export default function MangaDetailPage({ params }: { params: { slug: string } }
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Capítulos</h2>
-              {isAuthenticated && user && (
-                (user.is_superuser || (manga.author_id && String(user.id) === String(manga.author_id)))
-              ) && (
+              {isAuthenticated && (
                 <Link
                   href={`/mangas/${params.slug}/chapters/novo`}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg flex items-center gap-1 text-sm transition-colors"
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded-lg flex items-center gap-1 text-sm transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Novo Capítulo
@@ -382,27 +372,16 @@ export default function MangaDetailPage({ params }: { params: { slug: string } }
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
                 <p>Nenhum capítulo disponível</p>
-                {isAuthenticated && user && (
-                  (user.is_superuser || (manga.author_id && String(user.id) === String(manga.author_id)))
-                ) && (
+                {isAuthenticated && (
                   <Link
                     href={`/mangas/${params.slug}/chapters/novo`}
-                    className="mt-4 inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
+                    className="mt-4 inline-block bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
                   >
                     Adicionar o primeiro capítulo
                   </Link>
                 )}
               </div>
             )}
-          </div>
-
-          {/* Seção de comentários */}
-          <div className="mt-8">
-            <UnifiedCommentList
-              contentType={ContentType.MANGA}
-              contentId={params.slug}
-              title="Comentários do Mangá"
-            />
           </div>
         </>
       ) : (
@@ -411,7 +390,7 @@ export default function MangaDetailPage({ params }: { params: { slug: string } }
           <p className="text-gray-600 dark:text-gray-300 mb-6">O mangá que você está procurando não existe ou foi removido.</p>
           <Link
             href="/mangas"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
             Voltar para a lista de mangás
           </Link>

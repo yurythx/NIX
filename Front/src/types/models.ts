@@ -63,6 +63,7 @@ export interface Comment {
   is_approved?: boolean;
   is_spam?: boolean;
   reply_count?: number;
+  depth?: number;  // Profundidade do comentário na hierarquia
 }
 
 // Dados para criação de comentário
@@ -73,6 +74,7 @@ export interface CommentCreateData {
   article: number;  // ID do artigo
   article_slug: string;  // Slug do artigo
   parent?: number | null;  // ID do comentário pai (para respostas)
+  captcha_token?: string;  // Token de verificação do captcha
 }
 
 // Dados para atualização de comentário
