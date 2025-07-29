@@ -1,3 +1,0 @@
-"""
-Pacote de repositórios
-"""
