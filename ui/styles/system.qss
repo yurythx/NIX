@@ -1,0 +1,14 @@
+/*
+Tema do Sistema para o NIX Launcher
+
+Este é um arquivo de tema dinâmico que carrega o tema claro ou escuro
+com base nas configurações do sistema operacional.
+*/
+
+/* O conteúdo real será carregado dinamicamente pelo aplicativo */
+
+/* Esta é apenas uma marcação para indicar que o tema do sistema está ativo */
+QWidget {
+    /* Esta propriedade será substituída pelo tema real */
+    property string theme: "system";
+}

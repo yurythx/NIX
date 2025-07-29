@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nix-launcher"
+version = "0.1.0"
+description = "Um launcher de jogos moderno e personalizável"
+readme = "README.md"
+authors = [
+    { name = "Seu Nome", email = "seu.email@exemplo.com" },
+]
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Games/Entertainment",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "PyQt5>=5.15.9",
+    "vdf>=3.4",
+    "requests>=2.31.0",
+    "inputs>=0.5",
+    "pillow>=10.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.3.0",
+    "flake8>=6.0.0",
+    "mypy>=1.4.1",
+    "pytest>=7.4.0",
+    "pytest-qt>=4.2.0",
+    "pytest-cov>=4.1.0",
+]
+
+[project.scripts]
+nix-launcher = "nix_launcher.cli:main"
+
+[project.urls]
+"Homepage" = "https://github.com/seu-usuario/nix-launcher"
+"Bug Tracker" = "https://github.com/seu-usuario/nix-launcher/issues"
+"Source Code" = "https://github.com/seu-usuario/nix-launcher"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[tool.pytest.ini_options]
+addopts = "-v --cov=./ --cov-report=term-missing"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"

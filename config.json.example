@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "settings": {
+    "theme": "dark",
+    "fullscreen": false,
+    "language": "pt_BR",
+    "enable_analytics": false,
+    "check_for_updates": true,
+    "start_minimized": false,
+    "minimize_to_tray": true,
+    "close_to_tray": false,
+    "notifications_enabled": true,
+    "animation_speed": "normal",
+    "cache_ttl_days": 7,
+    "max_concurrent_downloads": 3,
+    "gamepad_deadzone": 0.2,
+    "gamepad_polling_interval": 16,
+    "keyboard_navigation_speed": 0.2,
+    "ui_scale": 1.0
+  },
+  "paths": {
+    "local_games": [
+      "C:\\Games",
+      "D:\\Jogos"
+    ],
+    "steam_path": "C:\\Program Files (x86)\\Steam",
+    "cache_directory": "~/.cache/nix-launcher",
+    "screenshots_directory": "~/Pictures/NIX Launcher/Screenshots",
+    "backup_directory": "~/.local/share/nix-launcher/backups"
+  },
+  "integrations": {
+    "steam": {
+      "enabled": true,
+      "import_steam_categories": true,
+      "import_steam_shortcuts": true
+    },
+    "gog_galaxy": {
+      "enabled": false,
+      "client_path": "C:\\Program Files (x86)\\GOG Galaxy\\GalaxyClient.exe"
+    },
+    "epic_games": {
+      "enabled": false,
+      "install_path": "C:\\ProgramData\\Epic"
+    },
+    "origin": {
+      "enabled": false
+    },
+    "uplay": {
+      "enabled": false
+    }
+  },
+  "ui": {
+    "show_fps": false,
+    "show_debug_info": false,
+    "grid_columns": 5,
+    "grid_spacing": 20,
+    "card_aspect_ratio": "16:9",
+    "card_show_title": true,
+    "card_show_platform": true,
+    "card_show_last_played": true,
+    "card_show_playtime": true,
+    "background_image": "",
+    "background_blur": 5,
+    "background_opacity": 0.7,
+    "accent_color": "#0078d7"
+  },
+  "shortcuts": {
+    "toggle_fullscreen": "F11",
+    "exit_application": "Ctrl+Q",
+    "minimize_window": "Ctrl+M",
+    "refresh_library": "F5",
+    "toggle_search": "Ctrl+F",
+    "toggle_settings": "Ctrl+,",
+    "navigate_up": "Up, W",
+    "navigate_down": "Down, S",
+    "navigate_left": "Left, A",
+    "navigate_right": "Right, D",
+    "select_item": "Return, Space",
+    "go_back": "Escape, Backspace"
+  },
+  "gamepad": {
+    "deadzone": 0.2,
+    "vibration_enabled": true,
+    "vibration_duration_ms": 100,
+    "vibration_intensity": 0.5,
+    "mapping": {
+      "a_button": "A",
+      "b_button": "B",
+      "x_button": "X",
+      "y_button": "Y",
+      "start_button": "Start",
+      "select_button": "Select",
+      "left_bumper": "LB",
+      "right_bumper": "RB",
+      "left_trigger": "LT",
+      "right_trigger": "RT",
+      "left_stick_click": "L3",
+      "right_stick_click": "R3",
+      "dpad_up": "DPAD_UP",
+      "dpad_down": "DPAD_DOWN",
+      "dpad_left": "DPAD_LEFT",
+      "dpad_right": "DPAD_RIGHT"
+    }
+  },
+  "advanced": {
+    "log_level": "INFO",
+    "log_to_file": true,
+    "log_file": "~/.local/share/nix-launcher/logs/nix-launcher.log",
+    "max_log_size_mb": 10,
+    "max_log_files": 5,
+    "enable_telemetry": false,
+    "enable_crash_reports": true,
+    "enable_analytics": false,
+    "enable_update_checks": true,
+    "check_for_beta_versions": false,
+    "http_timeout_seconds": 30,
+    "max_http_retries": 3,
+    "cache_enabled": true,
+    "cache_directory": "~/.cache/nix-launcher",
+    "max_cache_size_mb": 1024,
+    "worker_threads": 4
+  }
+}

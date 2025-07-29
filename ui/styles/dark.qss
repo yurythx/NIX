@@ -1,0 +1,407 @@
+/* Tema Escuro para o NIX Launcher */
+
+/* Cores principais */
+:root {
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #2d2d2d;
+    --bg-tertiary: #3e3e3e;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --accent: #4a90e2;
+    --accent-hover: #5aa0f2;
+    --border: #444444;
+    --error: #e74c3c;
+    --success: #2ecc71;
+    --warning: #f39c12;
+}
+
+/* Aplicação principal */
+QWidget {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 12px;
+}
+
+/* Barra de título personalizada */
+#titleBar {
+    background-color: var(--bg-secondary);
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+#titleLabel {
+    font-size: 14px;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+/* Botões */
+QPushButton {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    min-width: 80px;
+}
+
+QPushButton:hover {
+    background-color: var(--bg-secondary);
+    border-color: var(--accent);
+}
+
+QPushButton:pressed {
+    background-color: var(--accent);
+    color: white;
+}
+
+QPushButton:disabled {
+    background-color: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border-color: var(--border);
+}
+
+/* Campos de entrada */
+QLineEdit, QTextEdit, QPlainTextEdit, QComboBox, QSpinBox, QDoubleSpinBox, QDateEdit, QTimeEdit, QDateTimeEdit {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    min-height: 24px;
+}
+
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus, QComboBox:focus, QSpinBox:focus, QDoubleSpinBox:focus, QDateEdit:focus, QTimeEdit:focus, QDateTimeEdit:focus {
+    border-color: var(--accent);
+}
+
+/* Caixas de seleção e botões de opção */
+QCheckBox, QRadioButton {
+    color: var(--text-primary);
+    spacing: 6px;
+}
+
+QCheckBox::indicator, QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background-color: var(--bg-secondary);
+}
+
+QCheckBox::indicator:checked, QRadioButton::indicator:checked {
+    background-color: var(--accent);
+    border: 1px solid var(--accent);
+}
+
+QRadioButton::indicator {
+    border-radius: 8px;
+}
+
+/* Barras de rolagem */
+QScrollBar:vertical, QScrollBar:horizontal {
+    border: none;
+    background: var(--bg-secondary);
+    width: 10px;
+    height: 10px;
+}
+
+QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+    background: var(--bg-tertiary);
+    border-radius: 5px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover {
+    background: var(--accent);
+}
+
+QScrollBar::add-line, QScrollBar::sub-line, QScrollBar::add-page, QScrollBar::sub-page {
+    height: 0px;
+    width: 0px;
+}
+
+/* Abas */
+QTabWidget::pane {
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+}
+
+QTabBar::tab {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    padding: 6px 12px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--bg-primary);
+    margin-bottom: -1px;
+}
+
+QTabBar::tab:!selected {
+    margin-top: 2px;
+}
+
+/* Mensagens */
+QMessageBox {
+    background-color: var(--bg-primary);
+}
+
+QMessageBox QLabel {
+    color: var(--text-primary);
+}
+
+/* Cards de jogos */
+GameCard {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+}
+
+GameCard:hover {
+    border-color: var(--accent);
+    background-color: var(--bg-tertiary);
+}
+
+GameCard QLabel {
+    color: var(--text-primary);
+}
+
+GameCard QLabel#title {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+GameCard QLabel#details {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+/* Barra de progresso */
+QProgressBar {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-align: center;
+    background-color: var(--bg-secondary);
+}
+
+QProgressBar::chunk {
+    background-color: var(--accent);
+    width: 10px;
+    margin: 0.5px;
+}
+
+/* Tooltips */
+QToolTip {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 230;
+}
+
+/* Área de rolagem personalizada */
+QScrollArea {
+    border: none;
+    background: transparent;
+}
+
+QScrollArea > QWidget > QWidget {
+    background: transparent;
+}
+
+/* Botões de fechar/minimizar/maximizar */
+#closeButton, #minimizeButton, #maximizeButton {
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    border-radius: 3px;
+}
+
+#closeButton:hover, #minimizeButton:hover, #maximizeButton:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+#closeButton:pressed, #minimizeButton:pressed, #maximizeButton:pressed {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#closeButton {
+    color: #e74c3c;
+}
+
+#closeButton:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Tabelas */
+QTableView {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    gridline-color: var(--border);
+    outline: 0;
+}
+
+QTableView::item {
+    padding: 5px;
+    border: none;
+}
+
+QTableView::item:selected {
+    background-color: var(--accent);
+    color: white;
+}
+
+QHeaderView::section {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 5px;
+    border: none;
+    border-right: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+QHeaderView::section:last {
+    border-right: none;
+}
+
+/* Menu de contexto */
+QMenu {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 6px 25px 6px 20px;
+}
+
+QMenu::item:selected {
+    background-color: var(--accent);
+    color: white;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: var(--border);
+    margin: 4px 0;
+}
+
+/* Área de arrastar janela */
+#titleBar {
+    -webkit-app-region: drag;
+}
+
+#titleBar > * {
+    -webkit-app-region: no-drag;
+}
+
+/* Barra de status */
+QStatusBar {
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 8px;
+}
+
+/* Botões de navegação */
+.nav-button {
+    background-color: transparent;
+    border: none;
+    padding: 8px 12px;
+    color: var(--text-secondary);
+    text-align: left;
+    border-radius: 4px;
+}
+
+.nav-button:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.nav-button:checked {
+    background-color: var(--accent);
+    color: white;
+    font-weight: bold;
+}
+
+/* Ícones */
+QLabel[icon="true"] {
+    qproperty-alignment: AlignCenter;
+}
+
+/* Botões de ação */
+.action-button {
+    min-width: 24px;
+    min-height: 24px;
+    border-radius: 12px;
+    padding: 0;
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.action-button:hover {
+    background-color: var(--accent);
+    color: white;
+}
+
+/* Área de conteúdo */
+.content-area {
+    background-color: var(--bg-primary);
+    border-radius: 6px;
+    padding: 15px;
+}
+
+/* Títulos de seção */
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-primary);
+    margin: 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Mensagens de status */
+.status-message {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 5px 0;
+}
+
+.status-info {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+    border-left: 3px solid #3498db;
+}
+
+.status-success {
+    background-color: rgba(46, 204, 113, 0.2);
+    color: #2ecc71;
+    border-left: 3px solid #2ecc71;
+}
+
+.status-warning {
+    background-color: rgba(241, 196, 15, 0.2);
+    color: #f1c40f;
+    border-left: 3px solid #f1c40f;
+}
+
+.status-error {
+    background-color: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+    border-left: 3px solid #e74c3c;
+}

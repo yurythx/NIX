@@ -1,0 +1,15 @@
+# Dependências principais
+PyQt5==5.15.9           # Interface gráfica
+vdf==3.4                # Para manipulação de arquivos VDF da Steam
+requests==2.31.0        # Requisições HTTP
+inputs==0.5             # Suporte a gamepads e dispositivos de entrada
+
+# Dependências de desenvolvimento
+pytest==7.4.0           # Para execução de testes
+black==23.3.0           # Formatador de código
+flake8==6.0.0           # Linter
+mypy==1.4.1             # Verificação estática de tipos
+
+# Dependências opcionais
+Pillow==10.0.0          # Para manipulação de imagens (usado no cache de imagens)
+python-dotenv==1.0.0    # Para gerenciamento de variáveis de ambiente
