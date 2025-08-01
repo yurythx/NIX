@@ -6,9 +6,11 @@ suportadas pelo NIX Launcher.
 """
 
 import logging
+import os
 from typing import List, Dict, Any, Optional, Callable
 from pathlib import Path
 
+from config import emulator_config
 from .platforms import get_available_platforms, Game, PlatformHandler
 
 logger = logging.getLogger(__name__)
@@ -16,8 +18,27 @@ logger = logging.getLogger(__name__)
 class GameManager:
     """Gerenciador central de jogos para o NIX Launcher."""
     
-    def __init__(self):
-        """Inicializa o gerenciador de jogos."""
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        """Inicializa o gerenciador de jogos.
+        
+        Args:
+            config: Dicionário de configuração para os manipuladores de plataforma.
+                   Se None, as configurações serão carregadas automaticamente.
+        """
+        # Carrega a configuração de emuladores e combina com a configuração fornecida
+        emu_config = emulator_config.config
+        
+        # Se não houver pastas de ROMs configuradas, usa as pastas de jogos locais
+        if not emu_config.get("rom_directories") and config and "pastas_hd" in config:
+            emu_config["rom_directories"] = config.get("pastas_hd", [])
+        
+        # Combina as configurações
+        self.config = {
+            "emulators": emu_config.get("emulators", []),
+            "rom_directories": emu_config.get("rom_directories", []),
+            "pastas_hd": config.get("pastas_hd", []) if config else []
+        }
+        
         self.platforms: List[PlatformHandler] = []
         self.games: Dict[str, Game] = {}
         self._game_list_updated_callbacks = []
@@ -37,7 +58,7 @@ class GameManager:
         
         try:
             # Descobre plataformas disponíveis
-            self.platforms = get_available_platforms()
+            self.platforms = get_available_platforms(self.config)
             logger.info(f"Plataformas encontradas: {[p.name for p in self.platforms]}")
             
             # Carrega os jogos
@@ -105,17 +126,24 @@ class GameManager:
         """
         return list(self.games.values())
     
-    def get_game_by_id(self, game_id: str) -> Optional[Game]:
-        """
-        Obtém um jogo pelo seu ID.
+    def get_game(self, game_id: str) -> Optional[Game]:
+        """Obtém um jogo pelo ID.
         
         Args:
-            game_id: ID do jogo a ser obtido
+            game_id: ID do jogo a ser obtido.
             
         Returns:
-            O jogo correspondente ou None se não encontrado
+            O jogo correspondente ao ID ou None se não encontrado.
         """
         return self.games.get(game_id)
+        
+    def get_games(self) -> List[Game]:
+        """Obtém a lista de todos os jogos carregados.
+        
+        Returns:
+            Lista de jogos carregados.
+        """
+        return list(self.games.values())
     
     def launch_game(self, game_id: str) -> bool:
         """

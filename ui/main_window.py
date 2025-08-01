@@ -109,13 +109,13 @@ class MainWindow(QMainWindow):
         # Aplica o tema a todos os widgets filhos
         for widget in self.findChildren(QWidget):
             if hasattr(widget, 'setStyleSheet'):
-                widget.setStyleSheet(theme_manager.style_sheet)
+                widget.setStyleSheet(theme_manager._style_sheet)
         
         # Atualiza o tema das visualizações existentes
         if hasattr(self, 'games_view'):
-            self.games_view.setStyleSheet(theme_manager.style_sheet)
+            self.games_view.setStyleSheet(theme_manager._style_sheet)
         if hasattr(self, 'settings_view'):
-            self.settings_view.setStyleSheet(theme_manager.style_sheet)
+            self.settings_view.setStyleSheet(theme_manager._style_sheet)            
         
         # Força uma atualização da interface
         self.update()

@@ -10,7 +10,8 @@ Este pacote contém os módulos principais do NIX Launcher, incluindo:
 
 # Importações principais para facilitar o acesso aos módulos
 from .game_manager import game_manager, GameManager
-from .platforms import get_available_platforms, PlatformHandler, Game
+from .game import Game
+from .platforms import get_available_platforms, PlatformHandler
 from .input_handler import InputHandler, GamepadListener
 from .image_cache import ImageCache
 

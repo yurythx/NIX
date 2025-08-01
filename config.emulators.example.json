@@ -1,0 +1,56 @@
+{
+  "emulators": [
+    {
+      "name": "Snes9x",
+      "path": "C:\\Path\\To\\Snes9x\\snes9x-x64.exe",
+      "platforms": ["Super Nintendo", "SNES"],
+      "extensions": [".smc", ".sfc", ".fig", ".swc", ".mgd", ".zip"],
+      "args": "-fullscreen \"{rom}\"",
+      "working_dir": "C:\\Path\\To\\Snes9x"
+    },
+    {
+      "name": "Kega Fusion",
+      "path": "C:\\Path\\To\\KegaFusion\\Fusion.exe",
+      "platforms": ["Sega Mega Drive", "Sega Genesis", "Sega CD", "32X"],
+      "extensions": [".smd", ".bin", ".gen", ".md", ".sgd", ".68k", ".sg", ".pco", ".m3u", ".zip"],
+      "args": "-fullscreen -auto \"{rom}\"",
+      "working_dir": "C:\\Path\\To\\KegaFusion"
+    },
+    {
+      "name": "Dolphin",
+      "path": "C:\\Path\\To\\Dolphin\\Dolphin.exe",
+      "platforms": ["Nintendo GameCube", "Nintendo Wii"],
+      "extensions": [".gcm", ".iso", ".wbfs", ".ciso", "gcz", ".wad", ".dol", ".elf"],
+      "args": "-b -e \"{rom}\"",
+      "working_dir": "C:\\Path\\To\\Dolphin"
+    },
+    {
+      "name": "PCSX2",
+      "path": "C:\\Path\\To\\PCSX2\\pcsx2.exe",
+      "platforms": ["Sony PlayStation 2", "PS2"],
+      "extensions": [".iso", ".mdf", ".nrg", ".bin", ".img", ".gz", ".cso"],
+      "args": "--fullscreen --nogui \"{rom}\"",
+      "working_dir": "C:\\Path\\To\\PCSX2"
+    },
+    {
+      "name": "PPSSPP",
+      "path": "C:\\Path\\To\\PPSSPP\\PPSSPPWindows64.exe",
+      "platforms": ["Sony PSP", "PSP"],
+      "extensions": [".iso", ".cso", ".pbp", ".elf", ".prx"],
+      "args": "--fullscreen \"{rom}\"",
+      "working_dir": "C:\\Path\\To\\PPSSPP"
+    },
+    {
+      "name": "Project64",
+      "path": "C:\\Path\\To\\Project64\\Project64.exe",
+      "platforms": ["Nintendo 64", "N64"],
+      "extensions": [".n64", ".v64", ".z64", ".rom", ".ndd", ".u1", ".jag", ".j64"],
+      "args": "--fullscreen \"{rom}\"",
+      "working_dir": "C:\\Path\\To\\Project64"
+    }
+  ],
+  "pastas_hd": [
+    "D:\\Jogos\\ROMs",
+    "E:\\Games\\Emuladores"
+  ]
+}

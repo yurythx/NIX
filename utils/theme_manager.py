@@ -10,6 +10,7 @@ import platform
 import logging
 from pathlib import Path
 from typing import Optional, Dict, Any, Union
+from PyQt5.QtWidgets import QStyleFactory
 
 from PyQt5.QtCore import QFile, QTextStream, QSettings, Qt
 from PyQt5.QtGui import QPalette, QColor, QGuiApplication
@@ -246,15 +247,26 @@ class ThemeManager:
         
         # Estilos específicos para Windows
         if system == 'windows':
-            app.setStyle('Fusion')
+            fusion_style = QStyleFactory.create('Fusion')
+            if fusion_style:
+                app.setStyle(fusion_style)
         
         # Estilos específicos para macOS
         elif system == 'darwin':
-            app.setStyle('macos')
+            macos_style = QStyleFactory.create('macOS')
+            if macos_style:
+                app.setStyle(macos_style)
+            else:
+                # Fallback para Fusion se macOS não estiver disponível
+                fusion_style = QStyleFactory.create('Fusion')
+                if fusion_style:
+                    app.setStyle(fusion_style)
         
         # Estilos específicos para Linux
         elif system == 'linux':
-            app.setStyle('Fusion')
+            fusion_style = QStyleFactory.create('Fusion')
+            if fusion_style:
+                app.setStyle(fusion_style)
     
     def get_available_themes(self) -> Dict[str, Dict[str, Any]]:
         """

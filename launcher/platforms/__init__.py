@@ -46,20 +46,40 @@ class PlatformHandler(Protocol):
         ...
 
 
-def get_available_platforms() -> List[PlatformHandler]:
-    """Retorna uma lista de plataformas disponíveis no sistema."""
+def get_available_platforms(config: Optional[Dict[str, Any]] = None) -> List[PlatformHandler]:
+    """Retorna uma lista de plataformas disponíveis no sistema.
+    
+    Args:
+        config: Dicionário de configuração opcional. Se não fornecido, será usado um vazio.
+    """
     from .steam import SteamHandler
     from .local_games import LocalGamesHandler
+    from .emulators import EmulatorHandler
     
     available = []
+    config = config or {}
     
     # Verifica e adiciona Steam se disponível
-    steam = SteamHandler()
-    if steam.is_available():
-        available.append(steam)
+    try:
+        steam = SteamHandler()
+        if steam.is_available():
+            available.append(steam)
+    except Exception as e:
+        print(f"Erro ao carregar Steam: {e}")
     
     # Sempre adiciona suporte a jogos locais
-    local = LocalGamesHandler()
-    available.append(local)
+    try:
+        local = LocalGamesHandler()
+        available.append(local)
+    except Exception as e:
+        print(f"Erro ao carregar jogos locais: {e}")
+    
+    # Adiciona suporte a emuladores se configurado
+    try:
+        emulators = EmulatorHandler(config)
+        if emulators.is_available():
+            available.append(emulators)
+    except Exception as e:
+        print(f"Erro ao carregar emuladores: {e}")
     
     return available

@@ -308,7 +308,7 @@ class InputHandler:
     import time
     
     def on_input_event(event: InputEvent) -> None:
-        """Callback chamado quando um evento de entrada é detectado."""
+        ""Callback chamado quando um evento de entrada é detectado.""
         if event.button == Button.A and event.state == 1:
             print("Botão A pressionado!")
         elif event.button == Button.LEFT_X and event.is_analog:

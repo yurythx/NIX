@@ -153,6 +153,83 @@ sudo usermod -a -G input $USER
      }
      ```
 
+## 🎮 Configurando Emuladores
+
+O NIX Launcher suporta a execução de jogos através de emuladores. Você pode configurar seus emuladores favoritos para jogar ROMs de diversos consoles retrô.
+
+### 📋 Formatos Suportados
+
+O launcher é compatível com uma ampla variedade de emuladores e formatos de ROM, incluindo:
+
+- **Super Nintendo (SNES)**: .smc, .sfc, .fig, .swc, .mgd, .zip
+- **Sega Mega Drive/Genesis**: .smd, .bin, .gen, .md, .sgd, .68k, .sg, .pco, .m3u, .zip
+- **Nintendo 64**: .n64, .v64, .z64, .rom, .ndd, .u1, .jag, .j64
+- **PlayStation**: .iso, .bin, .img, .mdf, .pbp
+- **GameCube/Wii**: .gcm, .iso, .wbfs, .ciso, .gcz, .wad, .dol, .elf
+- **e muito mais!**
+
+### ⚙️ Configuração Básica
+
+1. **Localize o arquivo de configuração**:
+   - No Windows: `%APPDATA%\nix_launcher\emulators.json`
+   - No Linux/macOS: `~/.nix_launcher/emulators.json`
+
+2. **Edite o arquivo** seguindo o modelo abaixo:
+
+```json
+{
+  "emulators": [
+    {
+      "name": "Snes9x",
+      "path": "C:\\Path\\To\\Snes9x\\snes9x-x64.exe",
+      "platforms": ["Super Nintendo", "SNES"],
+      "extensions": [".smc", ".sfc", ".fig", ".swc", ".mgd", ".zip"],
+      "args": "-fullscreen \"{rom}\"",
+      "working_dir": "C:\\Path\\To\\Snes9x"
+    },
+    {
+      "name": "Kega Fusion",
+      "path": "C:\\Path\\To\\KegaFusion\\Fusion.exe",
+      "platforms": ["Sega Mega Drive", "Sega Genesis", "Sega CD", "32X"],
+      "extensions": [".smd", ".bin", ".gen", ".md", ".sgd", ".68k", ".sg", ".pco", ".m3u", ".zip"],
+      "args": "-fullscreen -auto \"{rom}\"",
+      "working_dir": "C:\\Path\\To\\KegaFusion"
+    }
+  ],
+  "rom_directories": [
+    "C:\\Path\\To\\My\\ROMs",
+    "D:\\Games\\ROMs"
+  ]
+}
+```
+
+3. **Configure os diretórios de ROMs** adicionando os caminhos onde suas ROMs estão armazenadas no array `rom_directories`.
+
+### 🔧 Opções de Configuração
+
+Cada emulador suporta as seguintes opções:
+
+- `name`: Nome de exibição do emulador
+- `path`: Caminho para o executável do emulador
+- `platforms`: Lista de plataformas suportadas (usadas para corresponder ROMs)
+- `extensions`: Lista de extensões de arquivo suportadas
+- `args`: Argumentos de linha de comando (use `{rom}` para o caminho da ROM)
+- `working_dir`: Diretório de trabalho do emulador (opcional)
+- `scan_subfolders`: Se deve procurar ROMs em subpastas (padrão: true)
+
+### 🎮 Iniciando Jogos
+
+1. Adicione seus diretórios de ROMs à configuração
+2. Inicie o NIX Launcher
+3. Seus jogos aparecerão automaticamente na biblioteca
+4. Navegue até o jogo desejado e pressione Enter ou clique para iniciar
+
+### 🔄 Atualizando a Biblioteca
+
+Para forçar uma nova verificação de ROMs:
+1. Pressione F5 ou clique em "Atualizar Biblioteca" no menu
+2. Aguarde a conclusão da verificação
+
 ## 🚀 Como Usar
 
 Execute o launcher com:
